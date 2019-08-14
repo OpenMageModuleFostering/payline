@@ -22,7 +22,7 @@ class Monext_Payline_Block_Wallet_Infos extends Mage_Payment_Block_Info{
             $expYear = substr($wallet['card']['expirationDate'], -2);
             $cardType = $wallet['card']['type'];
             $cardType = strtolower($cardType);
-            $img = '<img src="'.$this->getSkinUrl('images/'.$cardType.'.gif').'" />';
+            $img = '<img src="'.$this->getSkinUrl('images/monext/'.$cardType.'.gif').'" />';
             $data=array(
                 $this->__('Card type') => $img,
                 $this->__('Number') => sprintf('xxxx-%s', $cardNumber),

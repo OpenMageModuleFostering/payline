@@ -1,0 +1,83 @@
+<?php /* @var $this Monext_Payline_Block_Wallet_Details */ ?>
+<div class="wallet_details">
+<?php $wallet=$this->getWallet();?>
+<?php if ($wallet):?>
+<div class="box-account">
+    <div class="col2-set">
+        <div class="col-1">
+            <h3><?php echo $this->__('Card informations')?></h3>
+            <div class="box-content">
+                <?php echo $this->htmlEscape($wallet['card']['type']);?><br/>
+                <?php echo $this->htmlEscape($wallet['card']['number']);?><br/>
+                <?php echo $this->__('Expiration date (mmyy)').': '.$this->htmlEscape($wallet['card']['expirationDate']);?>
+            </div>
+        </div>
+        <div class="col-2">
+            <h3><?php echo $this->__('Owner')?></h3>
+            <div class="box-content">
+                <?php echo $this->htmlEscape($wallet['firstName'].' '.$wallet['lastName']);?>
+            </div>
+        </div>
+    </div>
+    
+    <?php if ($this->showShippingDetails):?>
+    <div class="box-title"><h3><?php echo $this->__('Contact informations');?></h3></div>
+    <div class="col2-set">
+        <div class="col-1">
+            <h4><?php echo $this->__('Phone and e-mail address')?></h4>
+            <div class="box-content">
+                <?php echo $this->htmlEscape($wallet['shippingAddress']['phone'])?><br/>
+                <?php echo $this->htmlEscape($wallet['email']);?>
+            </div>
+        </div>
+        <div class="col-2">
+            <h4><?php echo $this->__('Shipping address')?></h4>
+            <div class="box-content">
+                <address>
+                    <strong><?php echo $this->htmlEscape($wallet['shippingAddress']['name']);?></strong><br/>
+                    <?php echo $this->htmlEscape($wallet['shippingAddress']['street1']); ?><br/>
+                    <?php if ($wallet['shippingAddress']['street2']):?>
+                        <?php echo $this->htmlEscape($wallet['shippingAddress']['street2']); ?><br/>
+                    <?php endif;?>
+                    <?php echo $this->htmlEscape($wallet['shippingAddress']['zipCode']).' '.$this->htmlEscape($wallet['shippingAddress']['cityName']); ?><br/>
+                </address>
+            </div>
+        </div>
+    </div>
+    <?php endif;?>
+</div>
+<?php endif;?>
+</div>
+<?php /* 
+<dl>
+    <dt><h3><?php echo $this->__('Owner')?></h3></dt>
+    <dd><?php echo $this->htmlEscape($wallet['firstName'].' '.$wallet['lastName']);?></dd>
+    <dt><h3><?php echo $this->__('Card informations')?></h3></dt>
+    <dd><?php echo $this->htmlEscape($wallet['card']['type']).'<br/>'.$this->htmlEscape($wallet['card']['number']).'<br/>'.$this->__('Expiration date (mmyy)').': '.$this->htmlEscape($wallet['card']['expirationDate']);?></dd>
+    <?php if ($this->showShippingDetails):?>
+    <dt><h3><?php echo $this->__('Contact informations');?></h3></dt>
+    <dd>
+        <dl>
+            <dt><h4><?php echo $this->__('Shpping address')?></h4></dt>
+            <dd>
+                <address>
+                    <strong><?php echo $this->htmlEscape($wallet['shippingAddress']['name']);?></strong><br/>
+                    <?php echo $this->htmlEscape($wallet['shippingAddress']['street1']); ?><br/>
+                    <?php if ($wallet['shippingAddress']['street2']):?>
+                        <?php echo $this->htmlEscape($wallet['shippingAddress']['street2']); ?><br/>
+                    <?php endif;?>
+                    <?php echo $this->htmlEscape($wallet['shippingAddress']['zipCode']).' '.$this->htmlEscape($wallet['shippingAddress']['cityName']); ?><br/>
+                </address>
+            </dd>
+            <dt><h4><?php echo $this->__('Phone')?></h4></dt>
+            <dd><?php echo $this->htmlEscape($wallet['shippingAddress']['phone'])?></dd>
+            <dt><h4><?php echo $this->__('Email address')?></h4></dt>
+            <dd><?php echo $this->htmlEscape($wallet['email']);?></dd>
+        </dl>
+    </dd>
+    <?php endif;?>
+</dl>
+<?php endif;?>
+
+</div>
+*/

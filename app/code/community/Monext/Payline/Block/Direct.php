@@ -18,7 +18,7 @@ class Monext_Payline_Block_Direct extends Mage_Payment_Block_Form
         $this->setTemplate('payline/Direct.phtml');
         $redirectMsg = Mage::getStoreConfig('payment/PaylineNX/redirect_message');
         $this->setRedirectMessage($redirectMsg);
-        $this->setBannerSrc($this->getSkinUrl('images/payline-logo.png'));
+        $this->setBannerSrc($this->getSkinUrl('images/monext/payline-logo.png'));
     }
 
     public function getCcAvailableTypes()

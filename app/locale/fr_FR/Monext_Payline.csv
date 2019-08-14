@@ -154,3 +154,5 @@
 "Your payment is refused","Votre paiement est refusé"
 "Your payment is canceled","Votre paiement est annulé"
 "Set", "Mettre"
+"The payment via Payline isn't available from the administration of your platform.","Le paiement via Payline n'est pas disponible depuis l'administration de votre plateforme."
+"An error occured during the payment. Please retry later or use an other payment method.","Une erreur s'est produite lors du paiement. Veuillez réessayer dans quelques minutes ou utiliser un autre moyen de paiement."

@@ -1,8 +1,0 @@
-2014-04-13 16:28:45 - ----------------------------------------------------------
-2014-04-13 16:28:45 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
-2014-04-13 16:28:45 - webServiceRequest(getWallet) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
-2014-04-13 16:28:47 - response return (code 02500)
-2014-04-13 16:57:03 - ----------------------------------------------------------
-2014-04-13 16:57:03 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
-2014-04-13 16:57:03 - webServiceRequest(getWallet) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
-2014-04-13 16:57:05 - response return (code 02500)

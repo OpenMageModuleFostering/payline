@@ -158,7 +158,16 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
             return $res['wallet'];
         }
     }
-    
+
+    /**
+     * Clean the session and all necessary data
+     * @return Monext_Payline_Model_Wallet
+     */
+    public function clean()
+    {
+        // Clean wallet in customer session
+        Mage::getSingleton('customer/session')->unsWalletData();
+    }
 
     /**
      * Generate a random wallet_id

@@ -16,7 +16,7 @@ class Monext_Payline_Block_Cpt extends Mage_Payment_Block_Form
         $this->setTemplate('payline/Cpt.phtml');
         $redirectMsg = Mage::getStoreConfig('payment/PaylineCPT/redirect_message');
         $this->setRedirectMessage($redirectMsg);
-        $this->setBannerSrc($this->getSkinUrl('images/payline-logo.png'));
+        $this->setBannerSrc($this->getSkinUrl('images/monext/payline-logo.png'));
     }
 
     /**
@@ -84,17 +84,17 @@ class Monext_Payline_Block_Cpt extends Mage_Payment_Block_Form
             case '1EURO.COM' :
             case 'WEXPAY' :
             case '3XCB' :
-                return $this->getSkinUrl('images/payline_moyens_paiement/' . strtolower($cardType) . '.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/' . strtolower($cardType) . '.png');
             case 'CBPASS' :
-                return $this->getSkinUrl('images/payline_moyens_paiement/passvisa.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/passvisa.png');
             case 'INTERNET+' :
-                return $this->getSkinUrl('images/payline_moyens_paiement/internetplus.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/internetplus.png');
             case 'AMEX-ONE CLICK' :
-                return $this->getSkinUrl('images/payline_moyens_paiement/amexoneclick.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/amexoneclick.png');
             case 'SKRILL(MONEYBOOKERS)' :
-                return $this->getSkinUrl('images/payline_moyens_paiement/skrill.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/skrill.png');
             default :
-                return $this->getSkinUrl('images/payline_moyens_paiement/default.png');
+                return $this->getSkinUrl('images/monext/payline_moyens_paiement/default.png');
         }
     }
 

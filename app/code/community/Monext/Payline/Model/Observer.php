@@ -313,4 +313,14 @@ class Monext_Payline_Model_Observer
         $controller->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
     }
 
+    /**
+     * Clean payline
+     * @see customer_logout
+     */
+    public function cleanPayline(Varien_Event_Observer $observer)
+    {
+        // Clean the wallet
+        Mage::getSingleton('payline/wallet')->clean();
+    }
+
 }

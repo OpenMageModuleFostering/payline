@@ -572,8 +572,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
 
     public function doReauthorization($orderIncId)
     {
-        // Is this method used?? @jacquesbh
-        mail('jab@monsieurbiz.com', 'debug payline', mageDebugBacktrace(true));
+        // I think that this method is never use. @jacquesbh 2014-04-12
 
         $order = Mage::getModel('sales/order')->loadByIncrementId($orderIncId);
         if ($order->getId()) {

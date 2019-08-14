@@ -3,7 +3,7 @@
     <modules>
         <Monext_Payline>
             <version>1.7.7</version>
-            <release>1.7.9.0</release>
+            <release>1.8.0.1</release>
         </Monext_Payline>
     </modules>
     <global>
@@ -108,6 +108,14 @@
                     </payline>
                 </observers>
             </controller_action_postdispatch_checkout_onepage_saveShippingMethod>
+            <customer_logout>
+                <observers>
+                    <clean_payline>
+                        <class>payline/observer</class>
+                        <method>cleanPayline</method>
+                    </clean_payline>
+                </observers>
+            </customer_logout>
         </events>
         <sales>
             <quote>
@@ -256,6 +264,7 @@
                 <!-- Auth+Capture, 100 is capture only -->
                 <payline_payment_action>101</payline_payment_action>
                 <send_wallet_id>1</send_wallet_id>
+                <payment_action>order</payment_action>
             </PaylineDIRECT>
             <PaylineWALLET>
                 <model>payline/wallet</model>

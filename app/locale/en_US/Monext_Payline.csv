@@ -141,4 +141,5 @@
 "Page to return when payment is refused","Page to return when payment is refused"
 "Your payment is refused","Your payment is refused"
 "Your payment is canceled","Your payment is canceled"
-"Set","Set"
+"Set","Set""The payment via Payline isn't available from the administration of your platform.","The payment via Payline isn't available from the administration of your platform."
+"An error occured during the payment. Please retry later or use an other payment method.","An error occured during the payment. Please retry later or use an other payment method."

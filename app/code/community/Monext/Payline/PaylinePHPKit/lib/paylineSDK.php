@@ -356,7 +356,7 @@ final class Log {
 class paylineSDK{
 
 	// kit version
-	const KIT_VERSION		= 'Module Magento 1.7.9.0';
+	const KIT_VERSION		= 'Module Magento 1.8.0.1';
 	
 	// trace log
 	var $paylineTrace;
