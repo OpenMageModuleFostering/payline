@@ -356,7 +356,7 @@ final class Log {
 class paylineSDK{
 
 	// kit version
-	const KIT_VERSION		= 'module Magento 1.7.8';
+	const KIT_VERSION		= 'Module Magento 1.7.9.0';
 	
 	// trace log
 	var $paylineTrace;
@@ -1786,4 +1786,3 @@ class paylineSDK{
 		return $this->webServiceRequest($array,$WSRequest,paylineSDK::DIRECT_API,'verifyEnrollment');
 	}
 }
-?>

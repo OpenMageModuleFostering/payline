@@ -47,7 +47,7 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
         if(!$store_code) {
             if($website_code) {
                 $isWebsiteLevel = true;
-                $website        = Mage::getModel('core/website')->load($website_code);
+                $website        = Mage::app()->getWebsite($website_code);
                 $websiteId      = $website->getId();
                 $storeIds       = $website->getStoreIds();
             } else {
@@ -55,8 +55,7 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
             }
         } else {
             $isStoreViewLevel   = true;
-            $storeIds           = Mage::getModel('core/store')->load($store_code)->getId();
-            $storeIds           = array($storeIds);
+            $storeIds           = array(Mage::app()->getStore($store_code)->getId());
         }
 
         $connection->beginTransaction();
@@ -238,4 +237,3 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
     }
 
 } //end class
-?>

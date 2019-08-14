@@ -68,10 +68,10 @@ class Monext_Payline_IndexController extends Mage_Core_Controller_Front_Action
         if (!Mage::getStoreConfig('payment/payline_common/automate_wallet_subscription')){
             return;
         }
-        $customer=Mage::getSingleton('customer/session');
-        if ($customer->isLoggedIn()){
-            $customer=Mage::getModel('customer/customer')->load($customer->getId());
-            if (!$customer->getWalletId()){
+        $customerSession = Mage::getSingleton('customer/session');
+        if ($customerSession->isLoggedIn()){
+            $customer = $customerSession->getCustomer();
+            if (!$customer->getWalletId()) {
                 $customer->setWalletId($walletId);
                 $customer->save();
             }
@@ -245,8 +245,7 @@ class Monext_Payline_IndexController extends Mage_Core_Controller_Front_Action
         //Must be done before call to Payline helper initialisation
         $expiredWalletId=false;
         if(Mage::getSingleton('customer/session')->isLoggedIn()){
-            $customer=Mage::getSingleton('customer/session')->getCustomer();
-            $customer=Mage::getModel('customer/customer')->load($customer->getId());
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
             if ($customer->getWalletId() && !Mage::getModel('payline/wallet')->checkExpirationDate()){
                  $expiredWalletId=true;
             }
@@ -561,9 +560,8 @@ class Monext_Payline_IndexController extends Mage_Core_Controller_Front_Action
             }
         }
 
-        $customerId=Mage::getSingleton('customer/session')->getId();
-        $customer=Mage::getModel('customer/customer')->load($customerId);
-        $walletId=$customer->getWalletId();
+        $customer = Mage::getSingleton('customer/session')->getCustomer();
+        $walletId = $customer->getWalletId();
         $array['walletId']=$walletId;
 		$array['cardInd'] = '';
         $array['version'] = Monext_Payline_Helper_Data::VERSION;
@@ -643,9 +641,9 @@ class Monext_Payline_IndexController extends Mage_Core_Controller_Front_Action
         //Check if wallet is sendable
         //Must be done before call to Payline helper initialisation
         $expiredWalletId=false;
-        if(Mage::getSingleton('customer/session')->isLoggedIn()){
-            $customer=Mage::getSingleton('customer/session')->getCustomer();
-            $customer=Mage::getModel('customer/customer')->load($customer->getId());
+        $customerSession = Mage::getSingleton('customer/session');
+        if ($customerSession->isLoggedIn()){
+            $customer = $customerSession->getCustomer();
             if ($customer->getWalletId() && !Mage::getModel('payline/wallet')->checkExpirationDate()){
                 $expiredWalletId=true;
             }

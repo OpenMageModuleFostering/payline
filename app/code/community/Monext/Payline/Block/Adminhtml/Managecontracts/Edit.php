@@ -10,7 +10,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit extends Mage_Adminhtml
 
         parent::__construct();
 
-        $this->setData('form_action_url', Mage::getUrl('*/adminhtml_managecontracts/save'));
+        $this->setData('form_action_url', Mage::getUrl('*/payline_managecontracts/save'));
 
         $this->_updateButton('save', 'label', Mage::helper('payline')->__('Save contract'));
         $this->_removeButton('delete');

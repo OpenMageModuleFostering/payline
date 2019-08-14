@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <config>
-	<sections>
-		<payment>
-			<groups>
+    <sections>
+        <payment>
+            <groups>
                 <payline_common translate="label">
                     <label>Payline - Common settings</label>
                     <sort_order>200</sort_order>
@@ -10,7 +10,7 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <comment><![CDATA[<a href="http://www.payline.com/index.php/support/tester-payline.html" target="_blank">Tester Payline</a><br />La gestion des numéros de contracts se fait via "System > Gestion des contrats Payline"]]></comment>
-					<fields>
+                    <fields>
                         <merchant_id translate="label" module="payline">
                             <label>Merchant ID</label>
                             <frontend_type>text</frontend_type>
@@ -147,7 +147,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </resignation_order_status>
-						<fraud_order_status translate="label">
+                        <fraud_order_status translate="label">
                             <label>Order status when a fraud is suspected</label>
                             <comment></comment>
                             <frontend_type>select</frontend_type>
@@ -167,7 +167,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </automate_wallet_subscription>
-						<return_payment_refused translate="label comment">
+                        <return_payment_refused translate="label comment">
                             <label>Return options</label>
                             <comment>Page to return when payment is refused</comment>
                             <frontend_type>select</frontend_type>
@@ -179,48 +179,48 @@
                         </return_payment_refused>
                     </fields>
                 </payline_common>
-				<PaylineCPT translate="label">
-					<label>Payline - Cash web paiement</label>
-					<sort_order>201</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>1</show_in_website>
-					<show_in_store>1</show_in_store>
-					<fields>
-						<active translate="label">
-							<label>Enabled</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</active>
-						<title translate="label">
-							<label>Title</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>20</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</title>
-						<template_url translate="label comment">
-							<label>Template URL</label>
-							<comment>URL to a custom HTML template. Refer to Payline documentation</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>30</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</template_url>
-						<custom_payment_page_code translate="label comment">
-							<label>Custom payment page code</label>
-							<comment>ID of a style defined in Payline administration tool.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>40</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</custom_payment_page_code>
+                <PaylineCPT translate="label">
+                    <label>Payline - Cash web paiement</label>
+                    <sort_order>201</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <template_url translate="label comment">
+                            <label>Template URL</label>
+                            <comment>URL to a custom HTML template. Refer to Payline documentation</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </template_url>
+                        <custom_payment_page_code translate="label comment">
+                            <label>Custom payment page code</label>
+                            <comment>ID of a style defined in Payline administration tool.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_payment_page_code>
                         <custom_payment_page_code_ua_regexp translate="comment">
                             <label></label>
                             <frontend_model>adminhtml/system_config_form_field_regexceptions</frontend_model>
@@ -231,7 +231,7 @@
                             <show_in_store>1</show_in_store>
                             <comment>Match expressions in the same order as displayed in the configuration.</comment>
                         </custom_payment_page_code_ua_regexp>
-						<redirect_message translate="label">
+                        <redirect_message translate="label">
                             <label>Redirection message</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>50</sort_order>
@@ -239,15 +239,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </redirect_message>
-						<payline_payment_action translate="label">
-							<label>Payment action</label>
-							<frontend_type>select</frontend_type>
-							<source_model>payline/datasource_paymentactions</source_model>
-							<sort_order>60</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</payline_payment_action>
+                        <payline_payment_action translate="label">
+                            <label>Payment action</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payline/datasource_paymentactions</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </payline_payment_action>
                         <capture_payment_when_i_said translate="label">
                             <label>Capture payment when action / status is triggered</label>
                             <comment></comment>
@@ -258,7 +258,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <!-- 100 => authorization -->
-                            <depends><payline_payment_action>100</payline_payment_action></depends>
+                            <depends>
+                                <payline_payment_action>100</payline_payment_action>
+                            </depends>
                         </capture_payment_when_i_said>
                         <send_wallet_id translate="label comment">
                             <label>Send wallet id</label>
@@ -289,67 +291,67 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </action_when_order_seven_day_old>
-					</fields>
-				</PaylineCPT>
-				<PaylineNX translate="label">
-					<label>Payline - Nx web payment</label>
-					<sort_order>202</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>1</show_in_website>
-					<show_in_store>1</show_in_store>
-					<fields>
-						<active translate="label">
-							<label>Enabled</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</active>
-						<title translate="label">
-							<label>Title</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>20</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</title>
-						<cost_type translate="label">
-							<label>Costs</label>
-							<frontend_type>select</frontend_type>
-							<source_model>payline/datasource_costs</source_model>
-							<sort_order>21</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</cost_type>
-						<cost_amount translate="label">
-							<label>Costs amount/percentage</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>22</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</cost_amount>
-						<template_url translate="label comment">
-							<label>Template URL</label>
-							<comment>URL to a custom HTML template. Refer to Payline documentation</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>30</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</template_url>
-						<custom_payment_page_code translate="label comment">
-							<label>Custom payment page code</label>
-							<comment>ID of a style defined in Payline administration tool.</comment>
-							<frontend_type>text</frontend_type>
-							<sort_order>40</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</custom_payment_page_code>
+                    </fields>
+                </PaylineCPT>
+                <PaylineNX translate="label">
+                    <label>Payline - Nx web payment</label>
+                    <sort_order>202</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <cost_type translate="label">
+                            <label>Costs</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payline/datasource_costs</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cost_type>
+                        <cost_amount translate="label">
+                            <label>Costs amount/percentage</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cost_amount>
+                        <template_url translate="label comment">
+                            <label>Template URL</label>
+                            <comment>URL to a custom HTML template. Refer to Payline documentation</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </template_url>
+                        <custom_payment_page_code translate="label comment">
+                            <label>Custom payment page code</label>
+                            <comment>ID of a style defined in Payline administration tool.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_payment_page_code>
                         <custom_payment_page_code_ua_regexp translate="comment">
                             <label></label>
                             <frontend_model>adminhtml/system_config_form_field_regexceptions</frontend_model>
@@ -368,24 +370,24 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </redirect_message>
-						<billing_occurrences translate="label">
-							<label>Billing occurences</label>
-							<frontend_type>select</frontend_type>
-							<source_model>payline/datasource_billingoccurrences</source_model>
-							<sort_order>60</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</billing_occurrences>
-						<billing_cycle translate="label">
-							<label>Billing cycle</label>
-							<frontend_type>select</frontend_type>
-							<source_model>payline/datasource_billingcycles</source_model>
-							<sort_order>70</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</billing_cycle>
+                        <billing_occurrences translate="label">
+                            <label>Billing occurences</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payline/datasource_billingoccurrences</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </billing_occurrences>
+                        <billing_cycle translate="label">
+                            <label>Billing cycle</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payline/datasource_billingcycles</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </billing_cycle>
                         <send_wallet_id translate="label comment">
                             <label>Send wallet id</label>
                             <comment>If wallet id is provided, wallet payment will be available during web payment</comment>
@@ -425,16 +427,16 @@
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
                         </status_when_credit_card_schedule_is_expired>
-					</fields>
-				</PaylineNX>
-				<PaylineDIRECT translate="label">
-                	<label>Payline - direct payment</label>
+                    </fields>
+                </PaylineNX>
+                <PaylineDIRECT translate="label">
+                    <label>Payline - direct payment</label>
                     <sort_order>203</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                	<fields>
-                		<active translate="label">
+                    <fields>
+                        <active translate="label">
                             <label>Enabled</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -470,7 +472,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <!-- 100 => authorization -->
-                            <depends><payline_payment_action>100</payline_payment_action></depends>
+                            <depends>
+                                <payline_payment_action>100</payline_payment_action>
+                            </depends>
                         </capture_payment_when_i_said>
                         <automate_invoice_creation>
                             <label>Automate invoice creation</label>
@@ -491,7 +495,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </action_when_order_seven_day_old>
-                	</fields>
+                    </fields>
                 </PaylineDIRECT>
                 
                 <PaylineWALLET translate="label">
@@ -583,7 +587,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <!-- 100 => authorization -->
-                            <depends><payline_payment_action>100</payline_payment_action></depends>
+                            <depends>
+                                <payline_payment_action>100</payline_payment_action>
+                            </depends>
                         </capture_payment_when_i_said>
                         <action_when_order_seven_day_old>
                             <label>Action when order is at least 7 days old</label>
@@ -651,7 +657,7 @@
                         </automate_invoice_creation>
                     </fields>
                 </PaylineWALLET>
-			</groups>
-		</payment>
-	</sections>
+            </groups>
+        </payment>
+    </sections>
 </config>

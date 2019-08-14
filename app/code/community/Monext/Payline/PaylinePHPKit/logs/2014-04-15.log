@@ -1,0 +1,82 @@
+2014-04-15 18:55:33 - ----------------------------------------------------------
+2014-04-15 18:55:33 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 18:55:33 - webServiceRequest(getWallet) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
+2014-04-15 18:55:36 - response return (code 02500)
+2014-04-15 19:25:45 - ----------------------------------------------------------
+2014-04-15 19:25:45 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 19:25:45 - webServiceRequest(doAuthorization) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
+2014-04-15 19:25:48 - response return (code 00000)
+2014-04-15 19:25:48 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 19:25:50 - response return (code 00000)
+2014-04-15 19:25:50 - ----------------------------------------------------------
+2014-04-15 19:25:50 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 19:25:50 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 19:25:51 - response return (code 00000)
+2014-04-15 19:26:53 - ----------------------------------------------------------
+2014-04-15 19:26:53 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 19:26:53 - webServiceRequest(doWebPayment) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 19:26:54 - response return (code 00000)
+2014-04-15 19:27:16 - ----------------------------------------------------------
+2014-04-15 19:27:16 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 19:27:16 - webServiceRequest(getWebPaymentDetails) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 19:27:17 - response return (code 00000)
+2014-04-15 19:27:17 - ----------------------------------------------------------
+2014-04-15 19:27:17 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 19:27:17 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 19:27:18 - response return (code 00000)
+2014-04-15 20:00:50 - ----------------------------------------------------------
+2014-04-15 20:00:50 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 20:00:50 - webServiceRequest(doWebPayment) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 20:00:50 - response return (code 00000)
+2014-04-15 20:01:31 - ----------------------------------------------------------
+2014-04-15 20:01:31 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 20:01:31 - webServiceRequest(getWebPaymentDetails) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 20:01:34 - response return (code 02500)
+2014-04-15 20:01:35 - ----------------------------------------------------------
+2014-04-15 20:01:35 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 20:01:35 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 20:01:36 - response return (code 00000)
+2014-04-15 21:24:01 - ----------------------------------------------------------
+2014-04-15 21:24:01 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:24:01 - webServiceRequest(doAuthorization) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
+2014-04-15 21:24:03 - response return (code 00000)
+2014-04-15 21:24:03 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:24:04 - response return (code 00000)
+2014-04-15 21:24:04 - ----------------------------------------------------------
+2014-04-15 21:24:04 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:24:04 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:24:04 - response return (code 00000)
+2014-04-15 21:26:10 - ----------------------------------------------------------
+2014-04-15 21:26:10 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:26:10 - webServiceRequest(doAuthorization) - Location : https://homologation.payline.com/V4/services/DirectPaymentAPI
+2014-04-15 21:26:12 - response return (code 00000)
+2014-04-15 21:26:12 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:26:12 - response return (code 00000)
+2014-04-15 21:26:13 - ----------------------------------------------------------
+2014-04-15 21:26:13 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:26:13 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:26:13 - response return (code 00000)
+2014-04-15 21:26:33 - ----------------------------------------------------------
+2014-04-15 21:26:33 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:26:33 - webServiceRequest(doWebPayment) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 21:26:34 - response return (code 00000)
+2014-04-15 21:26:45 - ----------------------------------------------------------
+2014-04-15 21:26:45 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:26:45 - webServiceRequest(getWebPaymentDetails) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 21:26:47 - response return (code 02500)
+2014-04-15 21:26:48 - ----------------------------------------------------------
+2014-04-15 21:26:48 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:26:48 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:26:48 - response return (code 00000)
+2014-04-15 21:27:20 - ----------------------------------------------------------
+2014-04-15 21:27:20 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:27:20 - webServiceRequest(doWebPayment) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 21:27:21 - response return (code 00000)
+2014-04-15 21:27:28 - ----------------------------------------------------------
+2014-04-15 21:27:28 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:27:28 - webServiceRequest(getWebPaymentDetails) - Location : https://homologation.payline.com/V4/services/WebPaymentAPI
+2014-04-15 21:27:29 - response return (code 00000)
+2014-04-15 21:27:29 - ----------------------------------------------------------
+2014-04-15 21:27:29 - paylineSDK::__construct(20665821525569, xL****************jH, , , , , 0)
+2014-04-15 21:27:29 - webServiceRequest(getTransactionDetails) - Location : https://homologation.payline.com/V4/services/ExtendedAPI
+2014-04-15 21:27:30 - response return (code 00000)

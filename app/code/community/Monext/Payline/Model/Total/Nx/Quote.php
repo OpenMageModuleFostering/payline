@@ -85,4 +85,3 @@ class Monext_Payline_Model_Total_Nx_Quote extends Mage_Sales_Model_Quote_Address
     }
 }
 
-?>

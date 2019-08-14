@@ -7,6 +7,12 @@ class Monext_Payline_Model_Order_Invoice extends Mage_Sales_Model_Order_Invoice
      */
     public function canCapture()
     {
+        // Only if the payment method is one of Payline
+        $code = $this->getOrder()->getPayment()->getMethod();
+        if (!Mage::helper('payline')->isPayline($code)) {
+            return parent::canCapture();
+        }
+
         $canCapture         = parent::canCapture();
         $paymentMethod      = $this->getOrder()->getPayment()->getMethod();
         $paymentActionConf  = Mage::getStoreConfig('payment/'.$paymentMethod.'/payline_payment_action');

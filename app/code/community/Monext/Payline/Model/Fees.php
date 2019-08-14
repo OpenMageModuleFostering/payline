@@ -12,4 +12,3 @@ class Monext_Payline_Model_Fees extends Mage_Core_Model_Abstract
         $this->_init('payline/fees');
     }
 }
-?>

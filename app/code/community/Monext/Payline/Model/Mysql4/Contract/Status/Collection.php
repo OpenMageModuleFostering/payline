@@ -11,4 +11,3 @@ class Monext_Payline_Model_Mysql4_Contract_Status_Collection extends Mage_Core_M
     }
 }
 
-?>

@@ -3,6 +3,7 @@
     <modules>
         <Monext_Payline>
             <version>1.7.7</version>
+            <release>1.7.9.0</release>
         </Monext_Payline>
     </modules>
     <global>
@@ -11,34 +12,32 @@
                 <class>Monext_Payline_Block</class>
             </payline>
             <adminhtml>
-				<!-- Needed for Magento Enterprise 1.9 -->
-                 <rewrite>
+                <!-- Needed for Magento Enterprise 1.9 -->
+                <rewrite>
                     <sales_order_creditmemo_create_items>Monext_Payline_Block_Adminhtml_Sales_Order_Creditmemo_Create_Items</sales_order_creditmemo_create_items>
                     <customer_grid>Monext_Payline_Block_Adminhtml_Customer_Grid</customer_grid>
-                 </rewrite>
+                </rewrite>
             </adminhtml>
         </blocks>
         <models>
             <payline>
                 <class>Monext_Payline_Model</class>
-				<resourceModel>payline_mysql4</resourceModel>
+                <resourceModel>payline_mysql4</resourceModel>
             </payline>
-            
             <payline_mysql4>
-	            <class>Monext_Payline_Model_Mysql4</class>
-	            <entities>
-	                <contract>
-	                    <table>payline_contract</table>
-	                </contract>
-					<contract_status>
-	                    <table>payline_contract_status</table>
-	                </contract_status>
-					<fees>
-	                    <table>payline_nx_fees</table>
-	                </fees>
-	            </entities>
-	        </payline_mysql4>
-
+                <class>Monext_Payline_Model_Mysql4</class>
+                <entities>
+                    <contract>
+                        <table>payline_contract</table>
+                    </contract>
+                    <contract_status>
+                        <table>payline_contract_status</table>
+                    </contract_status>
+                    <fees>
+                        <table>payline_nx_fees</table>
+                    </fees>
+                </entities>
+            </payline_mysql4>
             <sales>
                 <rewrite>
                     <order_invoice>Monext_Payline_Model_Order_Invoice</order_invoice>
@@ -51,7 +50,6 @@
                 <class>Monext_Payline_Helper</class>
             </payline>
         </helpers>
-
         <resources>
             <payline_setup>
                 <setup>
@@ -80,28 +78,28 @@
                         <class>payline/observer</class>
                         <method>createInvoiceWhenStatusChange</method>
                     </payline>
-					 <payline_fees>
+                    <payline_fees>
                         <class>payline/observer</class>
                         <method>saveOrderNxFees</method>
                     </payline_fees>
                 </observers>
             </sales_order_save_after>
-			<sales_quote_collect_totals_before>
-				<observers>
-					<payline>
+            <sales_quote_collect_totals_before>
+                <observers>
+                    <payline>
                         <class>payline/observer</class>
                         <method>saveQuoteNxFees</method>
                     </payline>
-				</observers>
-			</sales_quote_collect_totals_before>
-			<sales_order_invoice_save_after>
-				<observers>
-					<payline>
+                </observers>
+            </sales_quote_collect_totals_before>
+            <sales_order_invoice_save_after>
+                <observers>
+                    <payline>
                         <class>payline/observer</class>
                         <method>saveInvoiceNxFees</method>
                     </payline>
-				</observers>
-			</sales_order_invoice_save_after>
+                </observers>
+            </sales_order_invoice_save_after>
             <controller_action_postdispatch_checkout_onepage_saveShippingMethod>
                 <observers>
                     <payline>
@@ -111,19 +109,18 @@
                 </observers>
             </controller_action_postdispatch_checkout_onepage_saveShippingMethod>
         </events>
-		
-		<sales>
+        <sales>
             <quote>
                 <totals>
                     <payline_nx>
                         <class>payline/total_nx_quote</class>
                         <after>subtotal</after>
                         <before>grand_total,tax</before>
-						<renderer>payline/checkout_total</renderer>
+                        <renderer>payline/checkout_total</renderer>
                     </payline_nx>
                 </totals>
-			</quote>
-			<order_invoice>
+            </quote>
+            <order_invoice>
                 <totals>
                     <payline_nx>
                         <class>payline/total_nx_invoice</class>
@@ -132,9 +129,12 @@
                     </payline_nx>
                 </totals>
             </order_invoice>
-		</sales>
+        </sales>
     </global>
     <frontend>
+        <secure_url>
+            <monext_payline>/payline/</monext_payline>
+        </secure_url>
         <routers>
             <payline>
                 <use>standard</use>
@@ -154,26 +154,26 @@
             </modules>
         </translate>
         <layout>
-              <updates>
-                  <payline module="Monext_Payline">
-                      <file>payline.xml</file>
-                  </payline>
-              </updates>
-          </layout>
+            <updates>
+                <payline module="Monext_Payline">
+                    <file>payline.xml</file>
+                </payline>
+            </updates>
+        </layout>
     </frontend>
-	<admin>
+    <admin>
         <routers>
-            <payline>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Monext_Payline</module>
-                    <frontName>payline</frontName>
+                    <modules>
+                        <monext_payline after="Mage_Adminhtml">Monext_Payline_Adminhtml</monext_payline>
+                    </modules>
                 </args>
-            </payline>
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>
-       <translate>
+        <translate>
             <modules>
                 <Monext_Payline>
                     <files>
@@ -183,39 +183,39 @@
             </modules>
         </translate>
         <layout>
-              <updates>
-                  <payline module="Monext_Payline">
-                      <file>payline.xml</file>
-                  </payline>
-              </updates>
-          </layout>
-		<menu>
+            <updates>
+                <payline module="Monext_Payline">
+                    <file>payline.xml</file>
+                </payline>
+            </updates>
+        </layout>
+        <menu>
             <system>
                 <children>
                     <payline translate="title" module="payline">
                         <title>Manage Payline Contracts</title>
                         <sort_order>10</sort_order>
-                        <action>payline/adminhtml_managecontracts</action>
+                        <action>adminhtml/payline_managecontracts/index</action>
                     </payline>
                 </children>
             </system>
         </menu>
         <acl>
-	        <resources>
-	            <admin>
-	                <children>
-	                    <system>
-	                    	<children>
-	                    		<payline>
-	                    			<title>Manage Payline Contracts</title>
-	                        		<sort_order>10</sort_order>
-	                    		</payline>
-	                    	</children>
-	                    </system>
-	                </children>
-	            </admin>
-	        </resources>
-	    </acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <payline>
+                                    <title>Manage Payline Contracts</title>
+                                    <sort_order>10</sort_order>
+                                </payline>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
     </adminhtml>
     <default>
         <payment>
@@ -225,7 +225,7 @@
                 <canceled_order_status>canceled</canceled_order_status>
                 <new_order_status>processing</new_order_status>
                 <init_order_status>pending</init_order_status>
-				<fraud_order_status>pending</fraud_order_status>
+                <fraud_order_status>pending</fraud_order_status>
                 <automate_wallet_subscription>1</automate_wallet_subscription>
                 <primary_max_fail_retry>1</primary_max_fail_retry>
                 <primary_call_timeout>15</primary_call_timeout>
@@ -234,12 +234,12 @@
                 <secondary_call_timeout>15</secondary_call_timeout>
                 <secondary_replay_timer>15</secondary_replay_timer>
                 <switch_back_timer>600</switch_back_timer>
-				<payline_ws_switch_enable></payline_ws_switch_enable>
-				<payline_err_code>02101,02102,02103</payline_err_code>
-				<payline_err_token>02317,02318</payline_err_token>
-				<primary_token_prefix>1</primary_token_prefix>
-				<secondary_token_prefix>2</secondary_token_prefix>
-				<return_payment_refused>0</return_payment_refused>
+                <payline_ws_switch_enable />
+                <payline_err_code>02101,02102,02103</payline_err_code>
+                <payline_err_token>02317,02318</payline_err_token>
+                <primary_token_prefix>1</primary_token_prefix>
+                <secondary_token_prefix>2</secondary_token_prefix>
+                <return_payment_refused>0</return_payment_refused>
             </payline_common>
             <PaylineCPT>
                 <model>payline/cpt</model>

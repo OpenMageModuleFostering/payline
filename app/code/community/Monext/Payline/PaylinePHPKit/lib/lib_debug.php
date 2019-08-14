@@ -549,4 +549,3 @@ if ( !defined('__LIB_DEBUG_PHP') )
 	}
 
 } // fin de la directive contre les inclusions multiples
-?>

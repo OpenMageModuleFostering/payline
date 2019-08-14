@@ -71,10 +71,9 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
     public function isAvailable($quote = null){
         $checkResult = new StdClass;
         $checkResult->isAvailable=false;
-        $customer=Mage::getSingleton('customer/session');
-        if ($customer->isLoggedIn()){
-            $customer=Mage::getModel('customer/customer')->load($customer->getId());
-            if ($customer->getWalletId()){
+        $customerSession = Mage::getSingleton('customer/session');
+        if ($customerSession->isLoggedIn()) {
+            if ($customerSession->getCustomer()->getWalletId()) {
                 $checkResult->isAvailable=true;
             }
         }

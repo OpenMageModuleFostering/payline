@@ -43,13 +43,11 @@ class Monext_Payline_Model_Cpt extends Mage_Payment_Model_Method_Abstract
 		$order = $payment->getOrder();
         $orderRef = $order->getRealOrderId();
 		$transactionId = $payment->getCcTransId();	
-		
-		$invoiceId = Mage::app()->getRequest()->getParam('invoice_id');
-		if($invoiceId) {
-			$invoice = Mage::getModel('sales/order_invoice')->load($invoiceId);
-			if($invoice->getTransactionId()) {
-				$transactionId = $invoice->getTransactionId();
-			}
+
+                if ($invoice = $payment->getCreditmemo()->getInvoice()) {
+                    if($invoice->getTransactionId()) {
+                        $transactionId = $invoice->getTransactionId();
+                    }
 		}
         
         $array = array();
@@ -71,6 +69,9 @@ class Monext_Payline_Model_Cpt extends Mage_Payment_Model_Method_Abstract
         $privateData['key'] = "orderRef";
         $privateData['value'] = $orderRef;
         $paylineSDK->setPrivate($privateData);
+
+        // Magento version
+        $array['version'] = Monext_Payline_Helper_Data::VERSION;
 
         // RESPONSE
         $response = $paylineSDK->doRefund($array);

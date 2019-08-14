@@ -6,6 +6,12 @@ class Monext_Payline_Model_Order_Payment extends Mage_Sales_Model_Order_Payment
      */
     public function capture($invoice)
     {
+        // Only if the payment method is one of Payline
+        $code = $this->getOrder()->getPayment()->getMethod();
+        if (!Mage::helper('payline')->isPayline($code)) {
+            return parent::capture($invoice);
+        }
+
         parent::capture( $invoice );
 
         $msgError = '[Monext_Payline_Model_Order_Payment#capture] ERROR Unable to set order status';
