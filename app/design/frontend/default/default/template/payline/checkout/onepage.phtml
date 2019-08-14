@@ -4,7 +4,10 @@
 </span>
 <script type="text/javascript">
 //<![CDATA[
-<?php $gotoSection = Mage::registry('payline-goto-section')?>
+<?php
+    $gotoSection = Mage::registry('payline-goto-section');
+    $filter = Mage::registry('payline-magento-version');
+?>
     checkout.gotoSection('<?php echo $gotoSection?>');
     var updater = new Ajax.Updater(
         'checkout-review-load',
@@ -17,7 +20,12 @@
             }
         }
     );
-    checkout.reloadProgressBlock();
-    
+
+    <?php if( $filter && $filter >= 1.8 ) : ?>
+        checkout.reloadStep('payment');
+    <?php else: ?>
+        checkout.reloadProgressBlock();
+    <?php endif; ?>
+
 //]]>
 </script>

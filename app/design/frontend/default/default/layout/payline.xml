@@ -30,6 +30,7 @@
         </reference>
     </cms_index_index>
     
+    <!-- magento CE 1.5 -->
     <checkout_onepage_progress>
         <reference name="payment_info">
             <action method="setInfoTemplate"><method>PaylineCPT</method><template>payline/checkout/onepage/info/default.phtml</template></action>
@@ -38,6 +39,16 @@
             <action method="setInfoTemplate"><method>PaylineWALLET</method><template>payline/checkout/onepage/info/default.phtml</template></action>
         </reference>
     </checkout_onepage_progress>
+    
+    <!-- magento CE 1.8 + EE 1.13 -->
+    <checkout_onepage_progress_payment>
+    	<reference name="payment_info">
+    		<action method="setInfoTemplate"><method>PaylineCPT</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineDIRECT</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineNX</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineWALLET</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+    	</reference>
+    </checkout_onepage_progress_payment>
     
     <customer_account>
         <reference name="customer_account_navigation">

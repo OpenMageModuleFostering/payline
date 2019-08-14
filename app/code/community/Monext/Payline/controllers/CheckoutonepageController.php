@@ -15,18 +15,18 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
         }
         //INIT
         $customer=Mage::getSingleton('customer/session')->getCustomer();
-        
+
         //Customer has wallet?
         if (!(Mage::getSingleton('customer/session')->isLoggedIn())){
             $this->_redirect('customer/account/login');
             return;
         }
-        
+
         if (!($walletId=$customer->getWalletId())){
             $this->_redirect('checkout/onepage');
             return;
         }
-        
+
         if (!Mage::helper('checkout')->canOnepageCheckout()) {
             Mage::getSingleton('checkout/session')->addError($this->__('The onepage checkout is disabled.'));
             $this->_redirect('checkout/cart');
@@ -45,7 +45,7 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
             $this->_redirect('checkout/cart');
             return;
         }
-        
+
         //Check if the wallet payment is available
         /* @var $walletPaymentMethod Monext_Payline_Model_Wallet */
         $walletPaymentMethod=Mage::getModel('payline/wallet');
@@ -55,7 +55,7 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
             $error.='<a href="'.Mage::getUrl('payline/wallet/manage').'">'.
                 $this->__('Update your wallet information').'</a>'.
                 $this->__(' or process your order below.');
-            Mage::getSingleton('checkout/session')->addError($error);    
+            Mage::getSingleton('checkout/session')->addError($error);
             $this->_redirect('checkout/cart');
             return;
         }elseif(!$walletPaymentMethod->isAvailable()){
@@ -64,11 +64,11 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
             $this->_redirect('checkout/cart');
             return;
         }
-        
+
         Mage::getSingleton('checkout/session')->setCartWasUpdated(false);
         Mage::getSingleton('customer/session')->setBeforeAuthUrl(Mage::getUrl('*/*/*', array('_secure'=>true)));
         //Init customer quote, isMultiShipping false
-        $onepage->initCheckout(); 
+        $onepage->initCheckout();
 
         //Checkout enabled?
         if (!Mage::helper('checkout')->canOnepageCheckout()) {
@@ -81,12 +81,12 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
             $onepage->saveCheckoutMethod(Mage_Checkout_Model_Type_Onepage::METHOD_CUSTOMER);
         }
 
-        
+
         //Get rid of a few problems if order not completed
         //$onepage->getQuote()->re//moveAllAddresses();
         $shippingAddressId = $this->getRequest()->getPost('shipping_address_id', false);
         $billingAddressId = $this->getRequest()->getPost('billing_address_id', false);
-/* PATCH for 1clic btn on checkout/cart */
+        /* PATCH for 1clic btn on checkout/cart */
         if (empty($shippingAddressId)){
             if($customer->getPrimaryShippingAddress()){
                 $shippingAddressId = $customer->getPrimaryShippingAddress()->getId();
@@ -105,7 +105,7 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
                 return;
             }
         }
-/* PATCH end */
+        /* PATCH end */
         $billingAddress=Mage::getModel('customer/address')->load($billingAddressId)->getData();
         $shippingAddress=Mage::getModel('customer/address')->load($shippingAddressId)->getData();
         $billingAddressForCheckout=array(
@@ -114,9 +114,9 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
         $shippingAddressForCheckout=array(
             'address_id'             =>     $shippingAddress['entity_id'],
         );
-       
+
         $onepage->saveBilling($billingAddressForCheckout, $billingAddressId);
-        
+
         $onepage->saveShipping($shippingAddressForCheckout, $shippingAddressId);
 
         // Get available shipping rates; if one is available by default then use it, otherwise ask customer
@@ -124,24 +124,31 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
             //Needed to get shipping methods
             $onepage->getQuote()->getShippingAddress()->collectShippingRates()->save();
             $array=$onepage->saveShippingMethod($methodCode);
-            
+
             Mage::dispatchEvent('checkout_controller_onepage_save_shipping_method', array('request'=>$this->getRequest(), 'quote'=>$quote));
         }
         $shippingMethod=$onepage->getQuote()->getShippingAddress()->getShippingMethod();
-        
+
         $data=array('method'=>'PaylineWALLET');
         $array=$onepage->savePayment($data);
         $this->loadLayout();
         $this->_initLayoutMessages('customer/session');
         $this->_getChargeProgress();
-        
+
         $gotoSection = 'review';
-        //If the shipping method is not configured, or the shipping address doesn't fit, 
+        //If the shipping method is not configured, or the shipping address doesn't fit,
         //the shipping method template is different : when the form is validated, the payment method will be validated as well
         if (!isset($shippingMethod) || empty($shippingMethod)){
             $this->getLayout()->getBlock('checkout.onepage.shipping_method')->setTemplate('payline/checkout/onepage/shipping-method.phtml');
             $gotoSection = 'shipping_method';
         }
+
+        if (version_compare(Mage::getVersion(), '1.8', 'ge')) {
+            $this->getLayout()->getBlock('checkout.onepage.shipping_method')->setTemplate('payline/checkout/onepage/shipping-method.phtml');
+            $this->getLayout()->getBlock('checkout.payment.methods')->setTemplate('payline/checkout/onepage/payment/methods.phtml');
+            Mage::register('payline-magento-version', 1.8);
+        }
+
         Mage::register('payline-goto-section', $gotoSection);
         $this->getLayout()->getBlock('head')->setTitle($this->__('Checkout'));
         $this->renderLayout();
