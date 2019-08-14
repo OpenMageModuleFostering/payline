@@ -1,0 +1,22 @@
+
+<?php echo $this->htmlEscape($this->getMethod()->getTitle()) ?>
+<br />
+<?php
+    $name = Mage::helper('payline')->getPaymentContractType( 
+                $this->getMethod()->getCode(),
+                $this->getInfo()->getCcType() );
+    echo $name;
+?>
+
+<?php if ($_specificInfo = $this->getSpecificInformation()):?>
+<table>
+<?php foreach ($_specificInfo as $_label => $_value):?>
+    <tr>
+        <td><?php echo $this->escapeHtml($_label)?>:</td>
+        <td><?php echo nl2br(implode($this->getValueAsArray($_value, true), "\n"))?></td>
+    </tr>
+<?php endforeach; ?>
+</table>
+<?php endif;?>
+
+<?php echo $this->getChildHtml()?>

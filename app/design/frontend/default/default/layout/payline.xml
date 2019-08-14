@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="right">
+            <block type="payline/wallet_sidebar"  ifconfig="payment/PaylineWALLET/active" name="left.payline-wallet-sidebar" template="payline/wallet/sidebar.phtml" after="cart_sidebar"/>
+        </reference>
+        <reference name="head">
+            <action method="addCss"><stylesheet>css/payline.css</stylesheet></action>        
+        </reference>
+    </default>
+    
+    <catalog_product_view>
+        <reference name="right">
+            <block type="payline/logo" name="right.payline-logo" template="payline/logo.phtml"/>
+        </reference>
+    </catalog_product_view>
+    <catalog_category_default>
+        <reference name="right">
+            <block type="payline/logo" name="right.payline-logo" template="payline/logo.phtml"/>
+        </reference>
+    </catalog_category_default>
+    <catalog_category_layered>
+        <reference name="right">
+            <block type="payline/logo" name="right.payline-logo" template="payline/logo.phtml"/>
+        </reference>
+    </catalog_category_layered>
+    <cms_index_index>
+        <reference name="right">
+            <block type="payline/logo" name="right.payline-logo" template="payline/logo.phtml"/>
+        </reference>
+    </cms_index_index>
+    
+    <checkout_onepage_progress>
+        <reference name="payment_info">
+            <action method="setInfoTemplate"><method>PaylineCPT</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineDIRECT</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineNX</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+            <action method="setInfoTemplate"><method>PaylineWALLET</method><template>payline/checkout/onepage/info/default.phtml</template></action>
+        </reference>
+    </checkout_onepage_progress>
+    
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action method="addLink" translate="label" module="payline" ifconfig="payment/PaylineWALLET/active"><name>payline</name><path>payline/wallet/manage</path><label>Wallet management</label></action>
+        </reference>
+        <reference name="left">
+            <block type="payline/wallet_sidebar" name="left.payline-wallet-sidebar" template="payline/wallet/sidebar.phtml" after="cart_sidebar" ifconfig="payment/PaylineWALLET/active"/>
+        </reference>
+    </customer_account>
+    
+    <checkout_cart_index>
+        <reference name="checkout.cart.methods">
+            <block type="payline/wallet_checkoutbtn" after="checkout.cart.methods.onepage" name="payline-wallet.checkoutbtn" ifconfig="payment/PaylineWALLET/active"/>
+        </reference>
+        <reference name="checkout.cart.top_methods">
+            <block type="payline/wallet_checkoutbtn" after="checkout.cart.methods.onepage" name="payline-wallet.checkoutbtn" ifconfig="payment/PaylineWALLET/active"/>
+        </reference>
+    </checkout_cart_index>
+    
+    <payline_wallet_manage>
+        <update handle="customer_account"/>
+        <reference name="content"> 
+            <block type="core/template" name="payline-wallet-manage" template="payline/wallet/manage.phtml">
+                <block type="payline/wallet_details" name="payline-wallet-details" />
+            </block>
+        </reference>
+    </payline_wallet_manage>
+
+    <payline_wallet_subscribe>
+        <update handle="customer_account"/>
+        <reference name="root">
+            <action method="setHeaderTitle" translate="title"><title>Subscribe to wallet</title></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="payline-wallet-subscribe" template="payline/wallet/subscribe.phtml">
+                <block type="cms/block" name="payline-wallet-subscribe-cmsblock" ifconfig="payment/PaylineWALLET/payline_register-oneclick_customeraccount" >
+                    <!-- <action method="setBlockId"><id>payline_register-oneclick_customeraccount</id></action>-->
+                </block>
+                <block type="core/template" name="payline-wallet-subscribe-iframe" template="payline/iframe.phtml" />
+            </block>
+        </reference>
+    </payline_wallet_subscribe>
+    
+    <payline_unloggedwallet_subscribereturn>
+        <reference name="root">
+            <action method="setTemplate"><template>payline/page/empty.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block name="payline-iframe-leaver" type="core/template" template="payline/iframeleaver.phtml" />
+        </reference>
+    </payline_unloggedwallet_subscribereturn>
+    <payline_unloggedwallet_subscribecancel>
+        <reference name="root">
+            <action method="setTemplate"><template>payline/page/empty.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block name="payline-iframe-leaver" type="core/template" template="payline/iframeleaver.phtml" />
+        </reference>
+    </payline_unloggedwallet_subscribecancel>
+    
+    
+    <payline_wallet_update>
+        <update handle="customer_account"/>
+        <reference name="root">
+            <action method="setHeaderTitle" translate="title"><title>Update wallet</title></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="payline-wallet-update" template="payline/wallet/update.phtml">
+                <block type="core/template" name="payline-wallet-update-iframe" template="payline/iframe.phtml" />
+            </block>
+        </reference>
+    </payline_wallet_update>
+    
+    <payline_unloggedwallet_updatereturn>
+        <reference name="root">
+            <action method="setTemplate"><template>payline/page/empty.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block name="payline-iframe-leaver" type="core/template" template="payline/iframeleaver.phtml" />
+        </reference>
+    </payline_unloggedwallet_updatereturn>
+    <payline_unloggedwallet_updatecancel>
+        <reference name="root">
+            <action method="setTemplate"><template>payline/page/empty.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block name="payline-iframe-leaver" type="core/template" template="payline/iframeleaver.phtml" />
+        </reference>
+    </payline_unloggedwallet_updatecancel>
+    
+    <payline_checkoutonepage_index>
+        <update handle="checkout_onepage_index" />
+        <reference name="content">
+            <block type="core/template" name="payline-checkoutonepage" template="payline/checkout/onepage.phtml" />
+        </reference>
+    </payline_checkoutonepage_index>
+    
+    <checkout_onepage_index>
+        <reference name="content">
+            <block type="core/template" name="payline-checkout-onepage-add-js" output="toHtml" after="-" template="payline/checkout/onepage/addjs.phtml" />
+        </reference>
+    </checkout_onepage_index>
+	
+	<sales_order_view>
+		<reference name="order_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</sales_order_view>
+	
+	<sales_order_print>
+		<reference name="order_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</sales_order_print>
+	
+	<sales_order_invoice>
+		<reference name="invoice_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</sales_order_invoice>
+	
+	<sales_order_printinvoice>
+		<reference name="invoice_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</sales_order_printinvoice>
+</layout>

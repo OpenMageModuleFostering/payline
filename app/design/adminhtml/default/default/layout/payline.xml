@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_customer_edit>
+        <reference name="customer_edit_tab_view">
+            <action method="setTemplate"><template>payline/customer/tab/view.phtml</template></action>
+        </reference>
+    </adminhtml_customer_edit>
+	
+	<payline_adminhtml_managecontracts_index>
+        <reference name="content">
+            <block type="payline/adminhtml_managecontracts" name="contracts_container">
+				<block type="adminhtml/system_config_switcher" name="store_switcher" as="store_switcher" template="payline/switcher.phtml"></block>
+			</block>
+        </reference>
+    </payline_adminhtml_managecontracts_index>
+	
+	<payline_adminhtml_managecontracts_edit>
+        <reference name="content">
+            <block type="payline/adminhtml_managecontracts_edit" name="contract_edit" />
+        </reference>
+    </payline_adminhtml_managecontracts_edit>
+	
+	<payline_adminhtml_managecontracts_grid>
+        <block type="core/text_list" name="root" output="toHtml">
+            <block type="payline/adminhtml_managecontracts_grid" name="admin.contracts.grid"/>
+        </block>
+    </payline_adminhtml_managecontracts_grid>
+	
+	<adminhtml_sales_order_view>
+		<reference name="order_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</adminhtml_sales_order_view>
+	
+	<adminhtml_sales_order_invoice_new>
+		<reference name="invoice_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</adminhtml_sales_order_invoice_new>
+
+	<adminhtml_sales_order_invoice_updateqty>
+		<reference name="invoice_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</adminhtml_sales_order_invoice_updateqty>
+
+	<adminhtml_sales_order_invoice_view>
+		<reference name="invoice_totals">
+			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
+		</reference>
+	</adminhtml_sales_order_invoice_view>
+  
+</layout>

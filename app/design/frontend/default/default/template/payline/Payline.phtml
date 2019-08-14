@@ -1,0 +1,11 @@
+<fieldset class="form-list">
+    <?php $_code=$this->getMethodCode() ?>
+    <ul id="payment_form_<?php echo $_code ?>" style="display:none">
+        <li><img src="<?php echo $this->getBannerSrc() ?>" alt="Payline" /></li>
+        <li>
+            <?php
+              echo $this->getRedirectMessage()
+            ?>
+        </li>
+    </ul>
+</fieldset> 

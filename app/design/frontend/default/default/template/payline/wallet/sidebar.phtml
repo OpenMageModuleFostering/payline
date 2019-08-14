@@ -1,0 +1,11 @@
+<?php /* @var $this Monext_Payline_Block_Wallet_Sidebar */?>
+<?php if ($this->getIsNeedToDisplaySideBar()): ?>
+<div class="block block-oneclick">
+    <div class="block-title">
+        <strong><span><?php echo Mage::getStoreConfig('payment/PaylineWALLET/one_clic_block_title') ?></span></strong>
+    </div>
+    <div class="block-content">
+        <?php echo $this->getContent(); ?>
+    </div>
+</div>
+<?php endif;?>

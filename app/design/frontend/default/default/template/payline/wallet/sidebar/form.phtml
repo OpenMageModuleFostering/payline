@@ -1,0 +1,17 @@
+<form id="wallet-checkout" method="post" action="<?php echo Mage::getUrl('payline/checkoutonepage/index');?>" >
+<div class="secured-by"><em><?php echo $this->__('Secured by Payline');?></em></div>
+<dl>
+    <dt><?php echo $this->__('Billing address')?></dt>
+    <dd><?php echo $this->getBillingAddresses();?></dd>
+    <dt><?php echo $this->__('Shipping address')?></dt>
+    <dd><?php echo $this->getShippingAddresses();?></dd>
+</dl>
+<p><a href="<?php echo Mage::getUrl('customer/address/');?>"><?php echo $this->__('Edit my data')?></a></p>
+<div class="actions">
+    <button class="button" title="<?php echo $this->__('My Wallet');?>" type="button"
+        onclick="setLocation('<?php echo $this->getUrl('payline/wallet/')?>')">
+        <span><?php echo $this->__('My Wallet');?></span>
+    </button>
+    <button class="button btn-wallet-checkout" title="<?php echo $this->__('1-click checkout');?>" type="submit"><span><span><?php echo $this->__('1-click checkout');?></span></span></button>
+</div>
+</form>

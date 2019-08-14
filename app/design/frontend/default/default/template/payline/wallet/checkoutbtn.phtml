@@ -1,0 +1,10 @@
+<?php if ($this->hasToDisplay()) :?>
+<button 
+    class="button btn-checkout" 
+    onclick="setLocation('<?php echo $this->getRedirectUrl();?>');"
+    title="<?php echo $this->__('1-click checkout');?>" 
+    type="button">
+        <span><span><?php echo $this->__('1-click checkout');?></span></span>
+</button>
+<div class="secured-by"><em><?php echo $this->__('Secured by Payline');?></em></div>
+<?php endif;?>

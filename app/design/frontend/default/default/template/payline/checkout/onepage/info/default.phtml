@@ -1,0 +1,18 @@
+<?php $_specificInfo = $this->getSpecificInformation()?>
+<?php if (!empty($_specificInfo)) :?>
+<table class="payline-payment">
+    <tbody>
+        <?php foreach ($_specificInfo as $_label => $_value):?>
+            <tr>
+                <th><?php echo $this->escapeHtml($_label)?>:</th>
+                <td><?php echo $_value?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+<?php else :?>
+<p><?php echo $this->htmlEscape($this->getMethod()->getTitle()) ?></p>
+<?php endif?>
+<div class="payline-payment-logo">
+    <img src="<?php echo $this->getSkinUrl('images/payline-logo.png')?>" />
+</div>

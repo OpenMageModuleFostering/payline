@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Monext_Payline>
+      <active>true</active>
+      <codePool>community</codePool>
+      <depends>
+        <Mage_Payment />
+        <Mage_Customer />
+		<Mage_Sales />
+      </depends>
+    </Monext_Payline>
+  </modules>
+</config>

@@ -1,0 +1,22 @@
+<div class="dashboard">
+    <div class="page-title">
+        <h1><?php echo $this->__('Wallet management') ?></h1>
+    </div>
+    <script type="text/javascript">
+    function checkDisableWallet(){
+		if(window.confirm("<?php echo $this->__("Are you sure?");?>")){
+			window.setLocation('<?php echo Mage::getBaseUrl().'/payline/wallet/disable' ?>');
+		}
+    }
+    </script>
+    <div class="wallet-manage-content">
+        <p><?php echo $this->__('You can manage here your saved payment informations');?></p>
+        <?php echo $this->getMessagesBlock()->getGroupedHtml(); ?>
+        
+        <?php echo $this->getChildHtml('payline-wallet-details');?>
+        <div class="actions">
+            <button type="button" title="<?php echo $this->__('Update payment informations') ?>" class="button" onclick="setLocation('<?php echo Mage::getBaseUrl().'/payline/wallet/update' ?>')"><span><span><?php echo $this->__('Update payment informations') ?></span></span></button>
+            <button type="button" title="<?php echo $this->__('Disable wallet') ?>" class="button" onclick="checkDisableWallet();"><span><span><?php echo $this->__('Disable wallet') ?></span></span></button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,16 @@
+<?php if ($this->getHasWallet()) :?>
+    <?php $label = $this->__('My Wallet')?>
+<?php else : ?>
+    <?php $label = $this->__('Register')?>
+<?php endif;?>
+<div class="notlogged">
+    <?php echo $this->getChildHtml();?>
+</div>
+<div class="actions">
+    <button class="button btn-wallet-checkout"
+        onclick="window.location='<?php echo Mage::getBaseUrl().'/payline/wallet/subscribe'?>';" 
+        title="<?php echo $label;?>" type="button"
+    >
+        <span><span><?php echo $label;?></span></span>
+    </button>
+</div>

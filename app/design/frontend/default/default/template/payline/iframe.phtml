@@ -1,0 +1,30 @@
+<iframe allowtransparency="true"
+	frameborder="0"
+	scrolling="yes" 
+	src="<?php echo $this->htmlEscape($this->getIframeSrc());?>" 
+	class="<?php echo $this->htmlEscape($this->getIframeClassName());?>"
+        id="iframe-resize"
+></iframe>
+<script>
+    function resizeIframe() {
+
+        var docHeight;
+        if (typeof document.height != 'undefined') {
+            docHeight = document.height;
+        }
+        else if (document.compatMode && document.compatMode != 'BackCompat') {
+            docHeight = document.documentElement.scrollHeight;
+        }
+        else if (document.body 
+            && typeof document.body.scrollHeight != 'undefined') {
+            docHeight = document.body.scrollHeight;
+        }
+
+        // magic number: suppress generation of scrollbars...
+        docHeight += 20;
+
+            document.getElementById('iframe-resize').style.height = docHeight + "px";    
+    }
+    document.getElementById('iframe-resize').onload = resizeIframe;
+    window.onresize = resizeIframe;
+</script>

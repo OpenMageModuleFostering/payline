@@ -1,0 +1,23 @@
+<?php /* @var $this Monext_Payline_Block_Checkout_Onepage */?>
+<span class="please-wait" id="final-review-please-wait">
+    <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo $this->__('Loading next step...') ?>" title="<?php echo $this->__('Loading next step...') ?>" class="v-middle" /> <?php echo $this->__('Loading next step...') ?>
+</span>
+<script type="text/javascript">
+//<![CDATA[
+<?php $gotoSection = Mage::registry('payline-goto-section')?>
+    checkout.gotoSection('<?php echo $gotoSection?>');
+    var updater = new Ajax.Updater(
+        'checkout-review-load',
+        '<?php echo $this->getUrl('*/*/review');?>',
+        {method: 'get',
+            onFailure: checkout.ajaxFailure.bind(checkout),
+            evalScripts: true,
+            onComplete: function(){
+                $('final-review-please-wait').hide();
+            }
+        }
+    );
+    checkout.reloadProgressBlock();
+    
+//]]>
+</script>

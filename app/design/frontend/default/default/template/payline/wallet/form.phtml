@@ -1,0 +1,15 @@
+<?php
+$walletData=$this->getWalletData();
+if (!empty($walletData)):?>
+<fieldset class="form-list">
+<?php $_code=$this->getMethodCode() ?>
+    <ul id="payment_form_<?php echo $_code ?>" style="display:none">
+    <?php foreach ($walletData as $key=>$value):?>
+		<li>
+        	<strong><?php echo $this->htmlEscape($key);?></strong>: 
+        	<?php echo $this->htmlEscape($value);?>
+        </li>
+    <?php endforeach;?>
+</ul>
+</fieldset>
+<?php endif;?>
