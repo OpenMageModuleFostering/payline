@@ -1,8 +1,8 @@
-<?php 
+<?php
 class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
 
     protected $_customer;
-    
+
     /**
      * Get logged in customer
      *
@@ -15,7 +15,7 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
         }
         return $this->_customer;
     }
-    
+
     /**
      * @return bool
      */
@@ -23,7 +23,7 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
     {
         return Mage::getSingleton('customer/session')->isLoggedIn();
     }
-    
+
     /**
      * Define if the sidebar is displayed
      *
@@ -56,7 +56,7 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
         }
         return false;
     }
-    
+
     /**
      * If customer logged & registered to wallet, display form
      * Otherwise, display configured static CMS bloc
@@ -74,7 +74,7 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
                     $formBlock->setTemplate('payline/wallet/sidebar/form.phtml');
                     $formBlock->setBillingAddresses($this->getAddressesHtmlSelect('billing'));
                     $formBlock->setShippingAddresses($this->getAddressesHtmlSelect('shipping'));
-                    
+
                     return $formBlock->toHtml();
                 }
             }
@@ -89,7 +89,7 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
         $notLoggedBlock->append($cmsBlock);
         return $notLoggedBlock->toHtml();
     }
-    
+
     /**
      * Return a html select with the customer addresses
      * Retrieve wether billing or shipping addresses, depending on the $type param
@@ -113,17 +113,16 @@ class Monext_Payline_Block_Wallet_Sidebar extends Mage_Core_Block_Template{
             } else {
                 $address = $this->getCustomer()->getPrimaryShippingAddress();
             }
-            if ($address) {
-                $addressId = $address->getId();
-            }
 
             $select = $this->getLayout()->createBlock('core/html_select')
                 ->setName($type.'_address_id')
                 ->setId($type.'-address-select')
                 ->setClass('address-select')
-                ->setValue($addressId)
                 ->setOptions($options);
 
+            if ($address) {
+                $select->setValue($address->getId());
+            }
 
             return $select->getHtml();
         }

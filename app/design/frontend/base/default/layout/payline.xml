@@ -146,12 +146,23 @@
         </reference>
     </payline_checkoutonepage_index>
     
-    <checkout_onepage_index>
-        <reference name="content">
-            <block type="core/template" name="payline-checkout-onepage-add-js" output="toHtml" after="-" template="payline/checkout/onepage/addjs.phtml" />
+    
+    <payline_index_directsecurized>
+        <reference name="root">
+            <action method="setTemplate"><template>payline/page/empty.phtml</template></action>
         </reference>
+        
+        <reference name="content">
+            <block type="core/template" name="payline-directsecurized" template="payline/checkout/directsecurized.phtml" />
+        </reference>
+    </payline_index_directsecurized>
+    
+    <checkout_onepage_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/payline.js</name></action>
+        </reference>        
     </checkout_onepage_index>
-	
+    
 	<sales_order_view>
 		<reference name="order_totals">
 			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
@@ -175,4 +186,26 @@
 			<block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
 		</reference>
 	</sales_order_printinvoice>
+  
+  <payline_remove_onepage_payment_step_handler>
+    <reference name="head">
+        <block type="payline/checkout_widget_header" name="checkout.onepage.review.payline.widget.header" as="payline-review-widget-header" translate="label"/>
+    </reference>
+
+     <reference name="payment.progress">
+      <action method="setTemplate"><name>payline/checkout/onepage/progress/order.phtml</name></action>
+    </reference> 
+    
+    <reference name="content">
+      <remove name="checkout.onepage.payment" />
+    </reference>
+  </payline_remove_onepage_payment_step_handler>
+
+    <payline_onepage_review_handler>
+        <reference name="checkout.onepage.review.info.items.after">
+            <block type="payline/checkout_widget_opcheckout" name="checkout.onepage.review.payline.widget.update" as="payline-review-widget-update" translate="label"  template="payline/checkout/onepage/widget-opcheckout-js-update.phtml" />
+        </reference>
+    </payline_onepage_review_handler>
+
+  
 </layout>

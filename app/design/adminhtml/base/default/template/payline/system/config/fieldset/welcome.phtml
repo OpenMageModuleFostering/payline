@@ -1,0 +1,46 @@
+<?php
+
+?>
+<div class="payline-welcome">
+    <table class="payline-head"><tr>
+    <td>
+        <div class="payline-payment-logo">
+            <img src="<?php echo $this->getPaylineLogo()?>" />
+        </div>
+        <div class="title">
+            <?php echo Mage::helper('payline')->__('Welcome in the Payline configuration payment center for Magento'); ?>
+        </div>
+    </td>
+    <td>
+        <div class="contact-us">
+            <?php echo $this->__('Need help? contact us')?>
+            <br/><a href="mailto:support@payline.com">support@payline.com</a>
+        </div>
+    </td>
+    </tr></table>
+    <br/>
+
+    <div class="version">
+    <?php if($this->getVersion()): ?>
+    <?php echo $this->__('Module version: %s', $this->getVersion()); ?>
+    <?php endif;?>
+
+    <?php if($this->getRelease()): ?>
+    <?php echo $this->__('(release: %s)', $this->getRelease()); ?>
+    <?php endif;?>
+    </div>
+
+
+
+    <div>
+    <?php if($this->isProduction()): ?>
+    <?php echo $this->__('Access your <a href="https://admin.payline.com/userManager.do?reqCode=prepareLogin" >Monext Administrative Center</a> in order to manage your Payline account, check follow transactions or check technical issues.'); ?>
+    <?php else:?>
+    <?php echo $this->__('In order to configure and try the module you need to <a href="http://www.payline.com/index.php/integrez/compte-de-test" >create a test account</a>'); ?>
+    <br/>
+    <?php echo $this->__('Access your <a href="https://homologation-admin.payline.com/userManager.do?reqCode=prepareLogin" >Monext Administrative Center</a> in order to manage your Payline account, check follow transactions or check technical issues.'); ?>
+    <?php endif;?>
+
+    </div>
+</div>
+<br/>

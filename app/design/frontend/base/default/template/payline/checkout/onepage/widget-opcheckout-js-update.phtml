@@ -1,0 +1,13 @@
+<?php
+/**
+ * Call via observer Monext_Payline_Model_Observer::alterBlockHtmlAfter
+ *
+ * @var $this Monext_Payline_Block_Checkout_Widget_Opcheckout
+ */
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    quoteBaseGrandTotal = <?php echo Mage::getSingleton('checkout/session')->getQuote()->getBaseGrandTotal(); ?>;
+    widgetWrapper.setFinalPaymentMethods(<?php echo $this->getJsonCurrentMethods(); ?>);
+    //]]>
+</script>

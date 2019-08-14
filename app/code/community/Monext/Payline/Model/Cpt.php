@@ -21,7 +21,7 @@ class Monext_Payline_Model_Cpt extends Mage_Payment_Model_Method_Abstract
     protected $_canCapturePartial = true;
     protected $_canVoid = true;
 
-    
+
     /**
     * Check whether payment method can be used
     * Rewrited from Abstract class
@@ -37,7 +37,7 @@ class Monext_Payline_Model_Cpt extends Mage_Payment_Model_Method_Abstract
     		return false;
     	}
     }
-    
+
     /**
      * Return Order place redirect url
      *

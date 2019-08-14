@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Payline contracts resource model 
+ * Payline contracts resource model
  */
 
 class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstract
 {
-	public function _construct() 
+	public function _construct()
     {
         $this->_init('payline/contract', 'id');
     }
-	
+
 	/**
 	 * set primary = 0 and secondary = 0 for contracts that are not in $pointOfSell
-	 * @param type $pointOfSell 
+	 * @param type $pointOfSell
 	 */
 	public function removePrimaryAndSecondaryNotIn($pointOfSell)
 	{
-		$connection = $this->_getWriteAdapter();	
+		$connection = $this->_getWriteAdapter();
 		$connection->beginTransaction();
 		$fields = array();
 		$fields['is_primary'] = 0;
@@ -28,11 +28,41 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
 	}
 
     // Use fallback history pattern
+    public function updateContractSecureList($ids, $optionToSet, $website_code, $store_code)
+    {
+        if(!is_array($ids)) {
+            $ids = array($ids);
+        }
+
+        $contractOptions= array();
+        foreach($ids as $contractId) {
+            $contractOptions[$contractId] = array('is_secure'=>$optionToSet);
+        }
+
+
+        $this->updateOptionsContractList($contractOptions, $website_code, $store_code);
+    }
+
+    // Use fallback history pattern
     public function updateContractWalletList($ids, $optionToSet, $website_code, $store_code)
     {
         if(!is_array($ids)) {
             $ids = array($ids);
         }
+
+        $contractOptions= array();
+        foreach($ids as $contractId) {
+            $contractOptions[$contractId] = array('is_included_wallet_list'=>$optionToSet);
+        }
+
+        $this->updateOptionsContractList($contractOptions, $website_code, $store_code);
+    }
+
+    // Use fallback history pattern
+    public function updateOptionsContractList($contractOptions, $website_code, $store_code)
+    {
+
+        $ids = array_keys($contractOptions);
 
         $pointOfSell        = $this->getPointOfSell($ids);
         $otherContracts     = $this->getContractsNotIn($pointOfSell);
@@ -42,6 +72,9 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
         $isWebsiteLevel     = false;
         $isStoreViewLevel   = false;
         $connection         = $this->_getWriteAdapter();
+
+
+        $keepOptionList=array('is_included_wallet_list','is_secure','is_primary','is_secondary');
 
         // set store & website code
         if(!$store_code) {
@@ -67,72 +100,84 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
             $conditions[]   = $connection->quoteInto('contract_id in (?)', $ids);
             $connection->delete($this->getTable('payline/contract_status'),$conditions);
 
-            $where  = $connection->quoteInto('id in (?)', $ids);
-            $fields = array( 'is_included_wallet_list' => $optionToSet );
-            $connection->update($this->getTable('payline/contract'), $fields, $where);
+            //Update contracts
+            foreach ($contractOptions as $id=>$optionToSet) {
+                $fields = $optionToSet;
+                $where  = $connection->quoteInto('id in (?)', $id);
+                $connection->update($this->getTable('payline/contract'), $optionToSet, $where);
+            }
 
-            // wallet subscription can be set for all point of sell. Uncomment below to avoid that.
-//            $this->resetContractWallet($connection, 0, $otherContracts, $websiteId, $storeIds);
+            //Unset other options
+            $optionToUnsset = array_fill_keys(array_keys(current($contractOptions)), 0);
+            $connection->update($this->getTable('payline/contract'), $optionToUnsset, $connection->quoteInto('id not in (?)', array_keys($contractOptions)));
 
             $count = Mage::getModel('payline/contract')->getCollection()->addFieldToFilter('is_primary',1)->getSize();
         } else {
             $contractStatusRModel =  Mage::getResourceModel('payline/contract_status');
 
-            $conditions = 'contract_id in ('.implode(',',$ids).') AND (';
-            if($isWebsiteLevel) $conditions .= 'website_id = '. $websiteId . ' OR ';
-            $conditions .= 'store_id in (' . implode(',',$storeIds) . '))';
+            $conditionContract = 'contract_id in ('.implode(',',$ids).')';
+            $conditionLevel= '(';
+            if($isWebsiteLevel) $conditionLevel .= 'website_id = '. $websiteId . ' OR ';
+            $conditionLevel .= 'store_id in (' . implode(',',$storeIds) . '))';
 
             // temporarily stock deleted rows to avoid is_primary and is_secondary data lost
             $deletedRows = $contractStatusRModel->queryContractStatus($ids, $storeIds, $websiteId);
 
-            $connection->delete($this->getTable('payline/contract_status'),$conditions);
+            $connection->delete($this->getTable('payline/contract_status'), $conditionContract . ' AND ' . $conditionLevel);
 
+            //Unset other options
+            $optionToUnsset = array_fill_keys(array_keys(current($contractOptions)), 0);
+            $connection->update($this->getTable('payline/contract_status'), $optionToUnsset, $connection->quoteInto('contract_id not in (?)', array_keys($contractOptions)) . ' AND ' . $conditionLevel);
+
+            $fields=array();
             $fields['is_primary']   = 0;
             $fields['is_secondary'] = 0;
-            foreach ($ids as $id) {
+            $fields['is_secure'] = 0;
+            $fields['is_included_wallet_list'] = 0;
+
+            foreach ($contractOptions as $id=>$optionToSet) {
                 if($isWebsiteLevel) {
                     $data = array(
-                        'contract_id'               => $id,
-                        'website_id'                => $websiteId,
-                        'store_id'                  => null,
-                        'is_primary'                => $fields['is_primary'],
-                        'is_secondary'              => $fields['is_secondary'],
-                        'is_included_wallet_list'   => $optionToSet
+                            'contract_id'               => $id,
+                            'website_id'                => $websiteId,
+                            'store_id'                  => null,
                     );
+
+                    $data=array_merge($data, $fields, $optionToSet);
                     // time to restore deleted info (if needed)
                     $backup = $contractStatusRModel->getMatchingRowByKeys( $deletedRows, $data );
-                    if( $backup ) {
-                        $data['is_primary']     = $backup['is_primary'];
-                        $data['is_secondary']   = $backup['is_secondary'];
+                    foreach($keepOptionList as $fieldToBackup) {
+                        if(!array_key_exists($fieldToBackup, $optionToSet)) {
+                            $data[$fieldToBackup]      = $backup[$fieldToBackup];
+                        }
                     }
+
                     $connection->insert($this->getTable('payline/contract_status'),$data);
                 }
                 foreach ($storeIds as $storeId) {
                     $data = array(
-                        'contract_id'               => $id,
-                        'website_id'                => null,
-                        'store_id'                  => $storeId,
-                        'is_primary'                => $fields['is_primary'],
-                        'is_secondary'              => $fields['is_secondary'],
-                        'is_included_wallet_list'   => $optionToSet
+                            'contract_id'               => $id,
+                            'website_id'                => null,
+                            'store_id'                  => $storeId,
                     );
+                    $data=array_merge($data, $fields, $optionToSet);
+                    // time to restore deleted info (if needed)
                     $backup = $contractStatusRModel->getMatchingRowByKeys( $deletedRows, $data );
-                    if( $backup ) {
-                        $data['is_primary']     = $backup['is_primary'];
-                        $data['is_secondary']   = $backup['is_secondary'];
+
+                    foreach($keepOptionList as $fieldToBackup) {
+                        if(!array_key_exists($fieldToBackup, $optionToSet)) {
+                            $data[$fieldToBackup]      = $backup[$fieldToBackup];
+                        }
                     }
                     $connection->insert($this->getTable('payline/contract_status'),$data);
                 }
             }
 
-            // wallet subscription can be set for all point of sell. Uncomment below to avoid that.
-//            $this->resetContractWallet($connection, ($isWebsiteLevel ? 2 : 3), $otherContracts, $websiteId, $storeIds);
-
             if($isWebsiteLevel) {
                 $count= Mage::getModel('payline/contract_status')->getCollection()
-                    ->addFieldToFilter('is_primary',1)
-                    ->addFieldToFilter('store_id',$storeIds)
-                    ->getSize();
+                ->addFieldToFilter('is_primary',1)
+                ->addFieldToFilter('store_id',$storeIds)
+                ->getSize();
             } else {
                 $count = Mage::getModel('payline/contract')->getCollection()->addFilterStatus(true,$storeId)->getSize();
             }
@@ -143,57 +188,6 @@ class Monext_Payline_Model_Mysql4_Contract extends Mage_Core_Model_Mysql4_Abstra
         Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('payline')->__('Contracts modified successfully'));
 
     } // end updateContractWalletList()
-
-    /**
-     * Reset contract wallet list for contracts that are not in $pointOfSell
-     *
-     * @param type $connection
-     * @param type $level
-     * @param type $ids
-     * @param type $websiteId
-     * @param type $storeIds
-     */
-    public function resetContractWallet($connection,$level,$ids,$websiteId,$storeIds) {
-        $fields                             = array();
-        $fields['is_primary']               = 0;
-        $fields['is_secondary']             = 0;
-        $fields['is_included_wallet_list']  = 0;
-
-        if($level == 0) {
-            $conditions = array();
-            $conditions[] = $connection->quoteInto('contract_id in (?)', $ids);
-            $connection->delete($this->getTable('payline/contract_status'),$conditions);
-
-            $where = $connection->quoteInto('id in (?)', $ids);
-            $connection->update($this->getTable('payline/contract'), $fields, $where);
-        } else  {
-            $conditions = 'contract_id in ('.implode(',',$ids).') AND (';
-            if($level == 2) $conditions .= 'website_id = '. $websiteId . ' OR ';
-            $conditions .= 'store_id in (' . implode(',',$storeIds) . '))';
-            $connection->delete($this->getTable('payline/contract_status'),$conditions);
-
-            foreach ($ids as $id) {
-                if($level == 2) {
-                    $data = array(
-                        'contract_id' => $id,
-                        'website_id' => $websiteId,
-                        'is_primary' => $fields['is_primary'],
-                        'is_secondary' => $fields['is_secondary']
-                    );
-                    $connection->insert($this->getTable('payline/contract_status'),$data);
-                }
-                foreach ($storeIds as $storeId) {
-                    $data = array(
-                        'contract_id' => $id,
-                        'store_id' => $storeId,
-                        'is_primary' => $fields['is_primary'],
-                        'is_secondary' => $fields['is_secondary']
-                    );
-                    $connection->insert($this->getTable('payline/contract_status'),$data);
-                }
-            } // end foreach( $ids
-        } // end else $level
-    }
 
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Payline product categories collection 
+ * Payline product categories collection
  */
 
 class Monext_Payline_Model_Mysql4_Productcategories_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
@@ -9,7 +9,7 @@ class Monext_Payline_Model_Mysql4_Productcategories_Collection extends Mage_Core
     public function _construct() {
         $this->_init('payline/productcategories');
     }
-    
+
     public function getAssignedPaylineCatId($storeCatId){
     	$assignmentData = $this->getData();
     	$continue = true;
@@ -24,4 +24,12 @@ class Monext_Payline_Model_Mysql4_Productcategories_Collection extends Mage_Core
     	}
     	return $paylineCatId;
     }
+
+	public function addStoreFilter($storeId = null)
+	{
+		if($storeId === null)
+		    return $this;
+
+		return $this;
+	}
 }

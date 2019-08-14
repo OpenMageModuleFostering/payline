@@ -1,13 +1,20 @@
 <?php
-
-/**
- * payline fees total block for checkout
- *
- */
-class Monext_Payline_Block_Checkout_Total extends Mage_Checkout_Block_Total_Default
+class Monext_Payline_Block_Checkout_Head extends Mage_Core_Block_Template
 {
     /**
-     * @var string
+     * Adding JS scripts and styles to block
+     *
+     * @throws Mage_Core_Exception
+     * @return Mage_Adminhtml_Block_Widget_Form_Container
      */
-    protected $_template = 'payline/checkout/total.phtml';
+    protected function _prepareLayout()
+    {
+        if (!Mage::helper('payline')->disableOnepagePaymentStep()) {
+            return $this;
+        }
+
+        $blockHead = $this->getLayout()->getBlock('head');
+
+        return parent::_prepareLayout();
+    }
 }

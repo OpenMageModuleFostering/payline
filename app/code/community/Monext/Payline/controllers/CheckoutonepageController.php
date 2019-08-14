@@ -4,7 +4,7 @@
  */
 require_once 'Mage/Checkout/controllers/OnepageController.php';
 class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageController {
-    
+
     /**
      * Initialize the onepage checkout by 1 click
      */
@@ -153,13 +153,13 @@ class Monext_Payline_CheckoutonepageController extends Mage_Checkout_OnepageCont
         $this->getLayout()->getBlock('head')->setTitle($this->__('Checkout'));
         $this->renderLayout();
     }
-    
+
     public function reviewAction()
     {
         $this->loadLayout('checkout_onepage_review');
         $this->renderLayout();
     }
-    
+
     protected function _getChargeProgress()
     {
         $steps = array('billing', 'shipping', 'shipping_method', 'payment');

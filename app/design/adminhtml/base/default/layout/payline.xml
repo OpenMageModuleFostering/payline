@@ -27,7 +27,7 @@
             <block type="payline/adminhtml_managecontracts_grid" name="admin.contracts.grid"/>
         </block>
     </adminhtml_payline_managecontracts_grid>
-    
+	
     <adminhtml_payline_manageproductcategories_index>
         <reference name="content">
             <block type="payline/adminhtml_manageproductcategories" name="productcategories_container">
@@ -42,7 +42,7 @@
     		</block>
     	</reference>
     </adminhtml_payline_manageproductcategories_assign>
-	
+
     <adminhtml_sales_order_view>
         <reference name="order_totals">
             <block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
@@ -66,5 +66,11 @@
             <block type="payline/adminhtml_sales_order_total_nxfees" name="nxfees_total" as="nxfees_total"/>
         </reference>
     </adminhtml_sales_order_invoice_view>
+    
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addItem"><type>skin_css</type><name>payline.css</name><params/></action>
+        </reference>
+    </adminhtml_system_config_edit>
   
 </layout>

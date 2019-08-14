@@ -1,0 +1,93 @@
+<?php
+/**
+ * Call via observer Monext_Payline_Model_Observer::alterBlockHtmlAfter
+ *
+ * @var $this Monext_Payline_Block_Checkout_Widget_Opcheckout
+ */
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    customPmHandler = function () {
+        return widgetWrapper.getPmMethods();
+    }
+
+    //Dummy payment initWhatIsCvvListeners method
+    Payment.prototype.initWhatIsCvvListeners = function () {
+    }
+
+    var paymentTemplate = new Template('<div id="pl-pmLayout-column-pmForm-custom-2" class="pl-pmForm" style="display: block;"><div id="pl-pm-custom_5-view" class="pl-paymentMethod-view pl-clear-after">'
+        + '<p id="pl-pm-custom_5-message" class="pl-message"/><div id="pl-pm-custom_5-formContainer" class="pl-form-container pl-hide-labels">'
+        + '<div id="pl-pm-custom_5-accountContainer" class="pl-form-group pl-has-feedback pl-accountContainer pl-clear-after"><p id="pl-pm-custom_5-account_message" class="pl-message"/><div class="pl-input-group-container">'
+        + '<div class="pl-input-group pl-input-container">'
+        + '<div class="magento-payline-custom-html">#{paymentHtml}</div>'
+        + '</div></div>'
+        + '</div><button id="pl-pm-custom_5-payBtn" class="pl-pay-btn" type="button" onclick="widgetWrapper.saveCustomPayment(\'#{paymentCode}\')">Payer</button></div></div></div>');
+
+    // Dummy payment object
+    var payment = new Payment();
+
+    var quoteBaseGrandTotal = <?php echo $this->getQuoteBaseGrandTotal(); ?>;
+    var lastPrice;
+    
+    var widgetWrapper = new PaylineWidgetWrapper('<?php echo Mage::helper('payline/widget')->getDataToken() ?>',
+        '<?php echo Mage::helper('payline/widget')->getDataTemplate() ?>',
+        '<?php echo $this->getSaveUrl() ?>',
+        <?php echo $this->getJsonAllMethods()?>,
+        <?php echo $this->getQuoteBaseGrandTotal()?>,
+        "<?php echo $this->getCurrencyCode(); ?>",
+        paymentTemplate
+    );
+
+    Review.prototype.isAgreementPassed = function () {
+        var agreementPassed = true;
+        this.elemDivAgreements = $('checkout-agreements')
+        if (this.elemDivAgreements) {
+            this.elemDivAgreements.select('input[type=checkbox][id^=agreement]').each(function (elem) {
+                if (!elem.checked) {
+                    agreementPassed = false;
+                }
+            });
+        }
+
+        return agreementPassed;
+    };
+
+    Review.prototype.save = function () {
+        if (checkout.loadWaiting != false) return;
+        if (this.isAgreementPassed()) {
+            if (this.elemDivAgreements) {
+                this.elemDivAgreements.hide();
+            }
+            widgetWrapper.showWidget();
+        } else {
+            $('review-buttons-container').show();
+            alert('<?php echo $this->jsQuoteEscape($this->__('Please agree to all the terms and conditions before placing the order.')); ?>');
+        }
+    };
+
+    Review.prototype.initialize = function (saveUrl, successUrl, agreementsForm) {
+        this.saveUrl = saveUrl;
+        this.successUrl = successUrl;
+        this.agreementsForm = agreementsForm;
+        this.onSave = this.nextStep.bindAsEventListener(this);
+        this.onComplete = this.resetLoadWaiting.bindAsEventListener(this);
+
+
+        var noAgreement = this.isAgreementPassed();
+        var that = this;
+
+        var quoteBaseGrandTotalINT=Math.round(String(quoteBaseGrandTotal*100));
+        var datasPayline = {"payment":{"amount":quoteBaseGrandTotalINT},"order":{"amount":quoteBaseGrandTotalINT}};
+
+
+        Payline.Api.updateWebpaymentData('<?php echo $this->helper('payline/widget')->getDataToken(); ?>', datasPayline,function (){
+            widgetWrapper.initPayline(noAgreement);
+            if (noAgreement) {
+                that.save();
+            }
+        });
+    }
+
+
+    //]]>
+</script>

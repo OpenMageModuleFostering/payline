@@ -14,12 +14,25 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
         $this->renderLayout();
     }
 
+    public function importFromConfigAction()
+    {
+        return $this->_importContract('adminhtml/system_config/edit/section/payline');
+    }
+
     public function importAction()
+    {
+        return $this->_importContract('*/*');
+    }
+
+
+    protected function _importContract($utlPath='*/*')
     {
         $updatedAt = new Zend_Date();
         $updatedAt = $updatedAt->toString(Varien_Date::DATETIME_INTERNAL_FORMAT);
 
         $paylineSDK = Mage::helper('payline')->initPayline('CPT');
+
+
         try {
             $result = $paylineSDK->getMerchantSettings(array('version' => Monext_Payline_Helper_Data::VERSION));
         } catch (Exception $e) {
@@ -28,7 +41,7 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
             Mage::getSingleton('adminhtml/session')->addError($msg);
             $msgLog = 'Unknown PAYLINE ERROR (payline unreachable?)';
             Mage::helper('payline/logger')->log('[importAction] ' . $this->order->getIncrementId() . $msgLog);
-            $this->_redirect('*/*');
+            $this->_redirect($utlPath);
             return;
         }
 
@@ -42,78 +55,86 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
 
             Mage::getSingleton('adminhtml/session')->addError($msgError);
             Mage::helper('payline/logger')->log('[importAction] ' . $result);
-            $this->_redirect('*/*');
-            return;
-        }
-
-        $nbContracts     = Mage::getModel('payline/contract')->getCollection()->getSize();
-        $first           = true;
-        $listPointOfSell = array();
-        if (isset($result['listPointOfSell']['pointOfSell'])) {
+        } elseif (isset($result['listPointOfSell']['pointOfSell'])) {
+            $nbContracts     = Mage::getModel('payline/contract')->getCollection()->getSize();
+            $first           = true;
+            $listPointOfSell = array();
             $listPointOfSell = $result['listPointOfSell']['pointOfSell'];
-        }
-        foreach ($listPointOfSell as $key => $pointOfSell) {
-            if (is_object($pointOfSell)) {
-                $contracts        = $pointOfSell->contracts->contract;
-                $pointOfSellLabel = $pointOfSell->label;
-            } else { //if only one point of sell, we parse an array
-                if ($key == 'contracts') {
-                    $contracts = $pointOfSell['contract'];
-                } elseif ($key == 'label') {
-                    $pointOfSellLabel = $pointOfSell;
-                    continue;
-                } else {
-                    continue;
-                }
-            }
-
-            if (!is_array($contracts)) {
-                $contracts = array($contracts);
-            }
-
-            if (is_array($contracts) && isset($contracts['contractNumber'])) {
-                $contracts = array((object) $contracts);
-            }
-
-            foreach ($contracts as $contract) {
-                $myContract = Mage::getModel('payline/contract')
-                        ->getCollection()
-                        ->addFieldToFilter('number', $contract->contractNumber)
-                        ->getFirstItem();
-
-                if ($myContract->getId()) { //contract exists, update
-                    $myContract->setName($contract->label)
-                        ->setPointOfSell($pointOfSellLabel)
-                        ->setContractDate($updatedAt)
-                        ->setContractType($contract->cardType)
-                        ->save();
-                } else {
-                    $new_contract = Mage::getModel('payline/contract')
-                        ->setName($contract->label)
-                        ->setNumber($contract->contractNumber)
-                        ->setPointOfSell($pointOfSellLabel)
-                        ->setContractType($contract->cardType)
-                        ->setContractDate($updatedAt);
-
-                    if ($first && !$nbContracts) { //force to have a primary contract
-                        $new_contract->setIsPrimary(1);
-                        $first = false;
+            foreach ($listPointOfSell as $key => $pointOfSell) {
+                if (is_object($pointOfSell)) {
+                    $contracts        = $pointOfSell->contracts->contract;
+                    $pointOfSellLabel = $pointOfSell->label;
+                } else { //if only one point of sell, we parse an array
+                    if ($key == 'contracts') {
+                        $contracts = $pointOfSell['contract'];
+                    } elseif ($key == 'label') {
+                        $pointOfSellLabel = $pointOfSell;
+                        continue;
+                    } else {
+                        continue;
                     }
+                }
 
-                    $new_contract->save();
+                if (!is_array($contracts)) {
+                    $contracts = array($contracts);
+                }
+
+                if (is_array($contracts) && isset($contracts['contractNumber'])) {
+                    $contracts = array((object) $contracts);
+                }
+
+                foreach ($contracts as $contract) {
+                    $myContract = Mage::getModel('payline/contract')
+                            ->getCollection()
+                            ->addFieldToFilter('number', $contract->contractNumber)
+                            ->getFirstItem();
+
+                    if ($myContract->getId()) { //contract exists, update
+                        $myContract->setName($contract->label)
+                            ->setPointOfSell($pointOfSellLabel)
+                            ->setContractDate($updatedAt)
+                            ->setContractType($contract->cardType)
+                            ->save();
+                    } else {
+                        $new_contract = Mage::getModel('payline/contract')
+                            ->setName($contract->label)
+                            ->setNumber($contract->contractNumber)
+                            ->setPointOfSell($pointOfSellLabel)
+                            ->setContractType($contract->cardType)
+                            ->setContractDate($updatedAt);
+
+                        if ($first && !$nbContracts) { //force to have a primary contract
+                            $new_contract->setIsPrimary(1);
+                            $first = false;
+                        }
+
+                        $new_contract->save();
+                    }
                 }
             }
-        }
 
-        //delete contracts not updated
-        $toDelete = Mage::getModel('payline/contract')->getCollection()
-                ->addFieldToFilter('contract_date', array('neq' => $updatedAt));
-        foreach ($toDelete as $contract) {
-            $contract->delete();
-        }
+            //delete contracts not updated
+            $toDelete = Mage::getModel('payline/contract')->getCollection()
+                    ->addFieldToFilter('contract_date', array('neq' => $updatedAt));
+            foreach ($toDelete as $contract) {
+                $contract->delete();
+            }
 
-        Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('payline')->__('Contracts imported successfully. Don\'t forget to define primary and secondary contracts!'));
-        $this->_redirect('*/*');
+            Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('payline')->__('Contracts imported successfully. Don\'t forget to define primary and secondary contracts!'));
+        } else {
+
+            $msgError = 'Unknown error occured while importing contract';
+            if (!empty($result['result']['longMessage'])) {
+                $msgError .= ' ('.$result['result']['longMessage'].')';
+            } elseif (!empty($result['result']['code'])) {
+                $msgError .= ' (code: '.$result['result']['code'].')';
+            }
+
+            Mage::getSingleton('adminhtml/session')->addError($msgError);
+            Mage::helper('payline/logger')->log('[importAction] ' . $msgError);
+
+        }
+        $this->_redirect($utlPath);
     }
 
     /**
@@ -136,6 +157,7 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
 
                     $is_primary   = (isset($postData['is_primary']) ? $postData['is_primary'] : 0);
                     $is_secondary = (isset($postData['is_secondary']) ? $postData['is_secondary'] : 0);
+                    $is_secure = (isset($postData['is_secure']) ? $postData['is_secure'] : 0);
 
                     $count = Mage::getModel('payline/contract')->getCollection()
                         ->addFieldToFilter('is_primary', 1)
@@ -154,6 +176,7 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
 
                     $contract->setIsPrimary($is_primary)
                         ->setIsSecondary($is_secondary)
+                        ->setIsSecure($is_secure)
                         ->save();
                     Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('payline')->__('Contract saved successfully'));
                 }
@@ -197,6 +220,7 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
         $this->_redirect('*/*/', array('website' => $website, 'store' => $store));
     }
 
+
     public function massWalletAction()
     {
         $contractIds = (array) $this->getRequest()->getParam('contract');
@@ -211,6 +235,20 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
         $this->_redirect('*/*/', array('website' => $website, 'store' => $store));
     }
 
+
+    public function massSecureAction()
+    {
+        $contractIds = (array) $this->getRequest()->getParam('contract');
+        $secure      = (int) $this->getRequest()->getParam('setSecure');
+        $store       = $this->getRequest()->getParam('store', 0);
+        $website     = $this->getRequest()->getParam('website', 0);
+
+        Mage::getResourceModel('payline/contract')->updateContractSecureList(
+                $contractIds, $secure, $website, $store
+        );
+
+        $this->_redirect('*/*/', array('website' => $website, 'store' => $store));
+    }
     /**
      * contracts grid for AJAX request
      */

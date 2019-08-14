@@ -323,4 +323,201 @@ class Monext_Payline_Model_Observer
         Mage::getSingleton('payline/wallet')->clean();
     }
 
+
+    /**
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function checkForConfigChanged(Varien_Event_Observer $observer)
+    {
+        $disablePayments = Mage::registry('payline_config_disable_payments');
+        if ($disablePayments) {
+            $config=Mage::getModel('core/config');
+            $store=null;
+            $paymentConfig = Mage::getStoreConfig('payment', $store);
+            foreach ($paymentConfig as $code => $methodConfig) {
+                if (Mage::getStoreConfigFlag('payment/'.$code.'/active', $store) and stripos($code,'payline')!==false ) {
+                    $config->saveConfig('payment/'.$code.'/active', 0);
+                }
+            }
+        }
+
+
+        $change = Mage::registry('payline_config_change');
+        if ($change) {
+            $url = Mage::helper("adminhtml")->getUrl('adminhtml/payline_managecontracts/importFromConfig');
+
+            Mage::app()->getFrontController()->getResponse()->setRedirect($url);
+            Mage::app()->getResponse()->sendResponse();
+            exit;
+        }
+    }
+
+    /**
+     *
+     * @param Varien_Event_Observer $observer
+     * @return void
+     */
+    public function configNestedPayment(Varien_Event_Observer $observer)
+    {
+        $paymentGroups   = $observer->getEvent()->getConfig()->getNode('sections/payline/groups');
+
+        $payments = $paymentGroups->xpath('payline_payments_availables/*');
+        foreach ($payments as $payment) {
+            if ((int)$payment->include) {
+
+                $fields = $paymentGroups->xpath((string)$payment->group . '/fields');
+                if (isset($fields[0])) {
+                    $fields[0]->appendChild($payment, true);
+                }
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param   Varien_Event_Observer $observer
+     * @return  Monext_Payline_Model_Observer
+     */
+    public function updateHandleToUnsetPaymentStep(Varien_Event_Observer $observer)
+    {
+        $action = $observer->getEvent()->getAction();
+        if ($action->getFullActionName() == "checkout_onepage_index" && Mage::helper('payline')->disableOnepagePaymentStep()) {
+            $update = $observer->getEvent()->getLayout()->getUpdate();
+            $update->addHandle('payline_remove_onepage_payment_step_handler');
+        }
+        return $this;
+    }
+
+
+    /**
+     *
+     * @param   Varien_Event_Observer $observer
+     * @return  Monext_Payline_Model_Observer
+     */
+    public function updateSectionTitle(Varien_Event_Observer $observer)
+    {
+        $action = $observer->getEvent()->getAction();
+        if ($action->getFullActionName() == "checkout_onepage_index" && Mage::helper('payline')->disableOnepagePaymentStep()) {
+            Mage::getSingleton('checkout/session')->setStepData('payment', array(
+                    'label'     => Mage::helper('checkout')->__('Payment Information'),
+                    'is_show'   => true
+            ));
+            Mage::getSingleton('checkout/session')->setStepData('review', array(
+                    'label'     => Mage::helper('checkout')->__('Payment Information'),
+                    'is_show'   => true
+            ));;
+        }
+        return $this;
+    }
+
+
+    /**
+     *
+     * @param Varien_Event_Observer $observer
+     * @return Monext_Payline_Model_Observer
+     */
+    public function postdispatchOnepageSaveShippingMethod(Varien_Event_Observer $observer)
+    {
+        if (!Mage::helper('payline')->disableOnepagePaymentStep()) {
+            return $this;
+        }
+
+        /* @var $controller Mage_Checkout_OnepageController */
+        $controller = $observer->getEvent()->getControllerAction();
+        $response = Mage::app()->getFrontController()->getResponse()->getBody(true);
+
+        if (!isset($response['default'])) {
+            return;
+        }
+
+        $response = Mage::helper('core')->jsonDecode($response['default']);
+
+        if ($response['goto_section'] == 'payment') {
+
+            $contractNumber = Mage::helper('payline')->getDefaultContractNumberForWidget();
+            if(empty($contractNumber)) {
+                throw new Exception('Cannot find valid contract number');
+            }
+            $onePage = Mage::getSingleton('checkout/type_onepage');
+            $onePage->getQuote()->getPayment()->importData(array('method'=>'PaylineCPT', 'cc_type'=>$contractNumber));
+
+
+            $layout = $controller->getLayout();
+            $update = $layout->getUpdate();
+            // Needed with cache activated
+            $update->setCacheId(uniqid("payline_onepage_review_payline"));
+
+            $controller->loadLayout(array('checkout_onepage_review','payline_onepage_review_handler'), true, true);
+            $response['goto_section'] = 'review';
+            $response['update_section'] = array(
+                    'name' => 'review',
+                    'html' => $controller->getLayout()->getBlock('root')->toHtml()
+            );
+
+            $controller->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
+        }
+
+        return $this;
+    }
+
+
+    /**
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function alterBlockHtmlAfter(Varien_Event_Observer $observer)
+    {
+        if (!Mage::helper('payline')->disableOnepagePaymentStep()) {
+            return $this;
+        }
+
+        $block = $observer->getEvent()->getBlock();
+        $transport = $observer->getEvent()->getTransport();
+
+        if($block instanceof Mage_Checkout_Block_Onepage_Shipping_Method) {
+            $block->getLayout()
+                ->createBlock('payline/checkout_widget_opcheckout', 'payline_checkout_widget_opcheckout_init')
+                ->setTemplate('payline/checkout/onepage/widget-opcheckout-js-init.phtml')
+                ->addHtmlAsChild($block, $transport);
+        }
+
+    }
+
+
+    /**
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function predispatchCheckoutOnepage(Varien_Event_Observer $observer)
+    {
+        if (!Mage::helper('payline')->disableOnepagePaymentStep()) {
+            return $this;
+        }
+
+        $needRedirect = false;
+
+        /* @var $controller Mage_Checkout_OnepageController */
+        $controller = $observer->getEvent()->getControllerAction();
+        $paylinetoken = $controller->getRequest()->getParam('paylinetoken');
+
+        $referer = Mage::helper('core/http')->getHttpReferer();
+        if ($paylinetoken) {
+            $token = Mage::getModel('payline/token')->load($paylinetoken, 'token');
+            if($token->getId()) {
+                $needRedirect = true;
+            }
+        }
+
+        if ($needRedirect) {
+            $params = $controller->getRequest()->getParams();
+            $params['_secure'] = true;
+
+            $controller->getResponse()->setRedirect(
+                    Mage::getUrl('payline/index/cptReturnWidget', $params)
+            );
+            $controller->setFlag('', Mage_Core_Controller_Varien_Action::FLAG_NO_DISPATCH, true);
+        }
+    }
 }

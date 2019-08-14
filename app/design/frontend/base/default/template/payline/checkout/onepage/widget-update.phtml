@@ -1,0 +1,14 @@
+<?php
+$data=array('payment'=>array('amount'=>$this->getQuoteBaseGrandTotal()),
+            'order'=>array('amount'=>$this->getQuoteBaseGrandTotal()));
+?>
+<script type="text/javascript">
+    var urlPayline='<?php echo $this->helper('payline/widget')->getUrlUpdate($this->helper('payline/widget')->getDataToken()); ?>';
+    var datas=<?php echo json_encode($data); ?>;
+
+    jQuery.ajax({
+        url: urlPayline,
+        type: 'PUT',
+        data:datas
+    });
+</script>

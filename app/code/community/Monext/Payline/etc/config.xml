@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Monext_Payline>
-            <version>1.8.3.1</version>
+            <version>1.8.5.2</version>
         </Monext_Payline>
     </modules>
     <global>
@@ -143,6 +143,13 @@
                 </totals>
             </order_invoice>
         </sales>
+        <fieldsets>
+            <sales_convert_quote_payment>
+                <card_token_pan>
+                    <to_order_payment>*</to_order_payment>
+                </card_token_pan>
+            </sales_convert_quote_payment>        
+        </fieldsets>
     </global>
     <frontend>
         <secure_url>
@@ -173,6 +180,51 @@
                 </payline>
             </updates>
         </layout>
+        <events>
+            <controller_action_layout_load_before>
+                <observers>
+                    <payline_layout_load_before>
+                        <class>payline/observer</class>
+                        <method>updateHandleToUnsetPaymentStep</method>
+                    </payline_layout_load_before>
+                </observers>
+            </controller_action_layout_load_before>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <payline_layout_generate_blocks_after>
+                        <class>payline/observer</class>
+                        <method>updateSectionTitle</method>
+                    </payline_layout_generate_blocks_after>
+                </observers>            
+            </controller_action_layout_generate_blocks_after>
+            <controller_action_postdispatch_checkout_onepage_saveShippingMethod>
+                <observers>
+                    <namespace_module_skip_shipping_method>
+                        <type>singleton</type>
+                        <class>payline/observer</class>
+                        <method>postdispatchOnepageSaveShippingMethod</method>
+                    </namespace_module_skip_shipping_method>
+                </observers>
+            </controller_action_postdispatch_checkout_onepage_saveShippingMethod>
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <payline_block_abstract_to_html_after>
+                        <type>singleton</type>
+                        <class>payline/observer</class>
+                        <method>alterBlockHtmlAfter</method>
+                    </payline_block_abstract_to_html_after>
+                </observers>
+            </core_block_abstract_to_html_after>
+            <controller_action_predispatch_checkout_onepage_index>
+                <observers>
+                    <payline_predispatch_checkout_onepage_index>
+                        <type>singleton</type>
+                        <class>payline/observer</class>
+                        <method>predispatchCheckoutOnepage</method>
+                    </payline_predispatch_checkout_onepage_index>
+                </observers>
+            </controller_action_predispatch_checkout_onepage_index>
+        </events>
     </frontend>
     <admin>
         <routers>
@@ -202,55 +254,30 @@
                 </payline>
             </updates>
         </layout>
-        <menu>
-            <system>
-                <children>
-                    <payline translate="title" module="payline">
-                        <title>Manage Payline Contracts</title>
-                        <sort_order>10</sort_order>
-                        <action>adminhtml/payline_managecontracts/index</action>
+        <events>
+            <admin_system_config_changed_section_payline>
+                <observers>
+                    <payline>
+                        <class>payline/observer</class>
+                        <method>checkForConfigChanged</method>
                     </payline>
-                </children>
-            </system>
-            <catalog>
-            	<children>
-                    <payline translate="title" module="payline">
-                        <title>Manage Payline Product Categories</title>
-                        <sort_order>10</sort_order>
-                        <action>adminhtml/payline_manageproductcategories/index</action>
+                </observers>
+            </admin_system_config_changed_section_payline>
+            <adminhtml_init_system_config>
+                <observers>
+                    <payline>
+                        <class>payline/observer</class>
+                        <method>configNestedPayment</method>
                     </payline>
-            	</children>
-            </catalog>
-        </menu>
-        <acl>
-            <resources>
-                <admin>
-                    <children>
-                        <system>
-                            <children>
-                                <payline>
-                                    <title>Manage Payline Contracts</title>
-                                    <sort_order>10</sort_order>
-                                </payline>
-                            </children>
-                        </system>
-                        <catalog>
-                        	<children>
-                        		<payline>
-                                    <title>Manage Payline Product Categories</title>
-                                    <sort_order>10</sort_order>
-                                </payline>
-                            </children>
-                        </catalog>
-                    </children>
-                </admin>
-            </resources>
-        </acl>
+                </observers>
+            </adminhtml_init_system_config>
+        </events>
     </adminhtml>
     <default>
         <payment>
             <payline_common>
                 <title>Common settings</title>
+                <payline_enabled>1</payline_enabled>
                 <failed_order_status>holded</failed_order_status>
                 <canceled_order_status>canceled</canceled_order_status>
                 <new_order_status>processing</new_order_status>
@@ -260,16 +287,19 @@
             </payline_common>
             <PaylineCPT>
                 <model>payline/cpt</model>
+                <title>Payline - Cash web paiement</title>
                 <!-- Auth+Capture, 100 is capture only -->
                 <payline_payment_action>101</payline_payment_action>
                 <send_wallet_id>1</send_wallet_id>
             </PaylineCPT>
             <PaylineNX>
                 <model>payline/nx</model>
+                <title>Payline - Nx web payment</title>
                 <send_wallet_id>1</send_wallet_id>
             </PaylineNX>
             <PaylineDIRECT>
                 <model>payline/direct</model>
+                <title>Payline - direct payment</title>
                 <!-- Auth+Capture, 100 is capture only -->
                 <payline_payment_action>101</payline_payment_action>
                 <send_wallet_id>1</send_wallet_id>
@@ -277,6 +307,7 @@
             </PaylineDIRECT>
             <PaylineWALLET>
                 <model>payline/wallet</model>
+                <title>Payline - wallet payment</title>
                 <payline_register-oneclick_customeraccount>payline_register-oneclick_customeraccount</payline_register-oneclick_customeraccount>
                 <payline_register-oneclick_catalog>payline_register-oneclick_catalog</payline_register-oneclick_catalog>
                 <update_payment_details>1</update_payment_details>

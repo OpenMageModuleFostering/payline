@@ -1,0 +1,105 @@
+<?php
+
+$_htmlId = $this->getHtmlId() ? $this->getHtmlId() : '_' . uniqid();
+
+$_colspan = 2;
+if (!$this->_addAfter) {
+    $_colspan -= 1;
+}
+$_colspan = $_colspan > 1 ? 'colspan="' . $_colspan . '"' : '';
+?>
+
+
+
+<?php if (!$this->getArrayRows()):?>
+<?php echo $this->__('You need to import your contracts to get the Payline module working.'); ?>
+<br/>
+<?php else:?>
+<div class="grid" id="grid<?php echo $_htmlId ?>">
+    <table cellpadding="0" cellspacing="0" class="border">
+        <tbody>
+            <tr class="headings" id="headings<?php echo $_htmlId ?>">
+            <?php foreach ($this->_columns as $columnName => $column):?>
+                <th <?php echo (!empty($column['style']) ? 'style="'.$column['style'].'"' : '');  ?>><?php echo $column['label'] ?></th>
+            <?php endforeach;?>
+            </tr>
+        </tbody>
+    </table>
+    <?php //Needed to access Monext_Payline_Model_Adminhtml_System_Config_Backend_Contract::_afterSave ?>
+    <input type="hidden" name="<?php echo $this->getElement()->getName() ?>" value="" />
+</div>
+<?php endif;?>
+
+<?php if ($this->canDisplayImportButton()):?>
+<button style="" onclick="window.location='<?php echo $this->getImportContractUrl() ?>'" class="scalable" type="button" title="<?php echo $this->__('Import contracts');?>">
+<span><span><span><?php echo $this->__('Import contracts');?></span></span></span>
+</button>
+<?php endif;?>
+
+<script type="text/javascript">
+//<![CDATA[
+// create row creator
+var arrayRow<?php echo $_htmlId ?> = {
+    // define row prototypeJS template
+    template : new Template(
+        '<tr id="#{_id}">'
+            <?php foreach ($this->_columns as $columnName => $column):?>
+            +'<td>'
+                +'<?php echo $this->_renderCellTemplate($columnName)?>'
+            +'<\/td>'
+            <?php endforeach;?>
+        +'<\/tr>'
+    ),
+
+    rowsCount : 0,
+
+    add : function(templateData, insertAfterId)
+    {
+        // generate default template data
+        if ('' == templateData) {
+            var d = new Date();
+            var templateData = {
+            <?php foreach ($this->_columns as $columnName => $column):?>
+                <?php echo $columnName ?> : '',
+            <?php endforeach;?>
+                _id : '_' + d.getTime() + '_' + d.getMilliseconds()
+            };
+        }
+
+        // insert before last row
+        if ('' == insertAfterId) {
+            Element.insert($('addRow<?php echo $_htmlId ?>'), {before: this.template.evaluate(templateData)});
+        }
+        // insert after specified row
+        else {
+            Element.insert($(insertAfterId), {after: this.template.evaluate(templateData)});
+        }
+
+        this.rowsCount += 1;
+    },
+
+    showButtonOnly : function()
+    {
+        $('grid<?php echo $_htmlId ?>').hide();
+        $('empty<?php echo $_htmlId ?>').show();
+    }
+}
+
+// bind add action to "Add" button in last row
+//Event.observe('addToEndBtn<?php echo $_htmlId ?>', 'click', arrayRow<?php echo $_htmlId ?>.add.bind(arrayRow<?php echo $_htmlId ?>, '', ''));
+
+// add existing rows
+<?php
+$_addAfterId = "headings{$_htmlId}";
+foreach ($this->getArrayRows() as $_rowId => $_row) {
+    echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}');\n";
+    $_addAfterId = $_rowId;
+}
+?>
+
+// toggle the grid, if element is disabled (depending on scope)
+<?php if ($this->getElement()->getDisabled()):?>
+toggleValueElements({checked:true}, $('grid<?php echo $_htmlId ?>').parentNode);
+<?php endif;?>
+//]]>
+</script>

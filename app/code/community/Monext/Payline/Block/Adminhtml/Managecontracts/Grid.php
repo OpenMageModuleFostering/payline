@@ -11,13 +11,13 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
         //$this->setVarNameFilter('contract_filter');
 		$this->setDefaultLimit(50);
     }
-	
+
 	protected function _getStore()
     {
         $storeId = (int) $this->getRequest()->getParam('store', 0);
         return Mage::app()->getStore($storeId);
     }
-	
+
 
     protected function _prepareCollection()
     {
@@ -31,9 +31,9 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 			$websiteId = Mage::getModel('core/website')->load($website)->getId();
 			$collection->addWebsiteFilter($websiteId);
 		}
-		
-        $this->setCollection($collection);		
-		
+
+        $this->setCollection($collection);
+
 		$temp = clone($collection);
 		foreach($temp as $c) {
 			if($c->getIsPrimary()) {
@@ -46,14 +46,14 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
     }
 
     protected function _prepareColumns()
-    {		
+    {
         $this->addColumn('name', array(
             'header'    => Mage::helper('payline')->__('Name'),
             'index'     => 'name',
 			'filter' => false,
             'type'		=> 'text'
         ));
-		
+
         $this->addColumn('number', array(
             'header'    => Mage::helper('payline')->__('Number'),
             'index'     => 'number',
@@ -67,7 +67,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 			'type'		=> 'text',
             'filter'    => false
         ));
-		 
+
 		 $this->addColumn('is_primary', array(
             'header'    => Mage::helper('payline')->__('Primary'),
             'index'     => 'is_primary',
@@ -75,7 +75,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 			 'filter' => false,
 			'options' => array('1' => Mage::helper('payline')->__('X'), '0' => Mage::helper('payline')->__('-'))
         ));
-		 
+
 		 $this->addColumn('is_secondary', array(
             'header'    => Mage::helper('payline')->__('Secondary'),
             'index'     => 'is_secondary',
@@ -83,6 +83,15 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 			 'filter' => false,
 			'options' => array('1' => Mage::helper('payline')->__('X'), '0' => Mage::helper('payline')->__('-'))
         ));
+
+
+		 $this->addColumn('is_secure', array(
+		         'header'    => Mage::helper('payline')->__('Secure'),
+		         'index'     => 'is_secure',
+		         'type'    => 'options',
+		         'filter' => false,
+		         'options' => array('1' => Mage::helper('payline')->__('X'), '0' => Mage::helper('payline')->__('-'))
+		 ));
 
         $this->addColumn('is_included_wallet_list', array(
             'header'    => Mage::helper('payline')->__('Wallet'),
@@ -96,9 +105,9 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 
         return parent::_prepareColumns();
     }
-    
- 
-	
+
+
+
 	protected function _preparePointOfSell() {
 		$pointOfSells = Mage::getModel('payline/contract')->getCollection()
 							->getSelect()
@@ -111,10 +120,10 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
 		foreach ($result as $p) {
 			$res[$p['point_of_sell']] = $p['point_of_sell'];
 		}
-		
-		return $res;		
+
+		return $res;
 	}
-	
+
 	protected function _prepareMassaction()
     {
         $this->setMassactionIdField('id');
@@ -146,7 +155,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
                          'type' => 'select',
                          'class' => 'required-entry',
                          'label' => Mage::helper('catalog')->__('Status'),
-                         'values' => array(0 => Mage::helper('payline')->__('Primary'), 
+                         'values' => array(0 => Mage::helper('payline')->__('Primary'),
 										   1 => Mage::helper('payline')->__('Secondary'),
 										   2 => Mage::helper('payline')->__('Primary') . ' & ' . Mage::helper('payline')->__('Secondary'),
 										   3 => Mage::helper('payline')->__('Nothing'))
@@ -154,19 +163,35 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Grid extends Mage_Adminhtml
              )
         ));
 
-       
+        $this->getMassactionBlock()->addItem('setSecure', array(
+                'label' => Mage::helper('payline')->__('Set as secured'),
+                'url'   => $this->getUrl('*/*/massSecure', array('_current'=>true)),
+                'additional' => array(
+                        'visibility'    => array(
+                                'name'      => 'setSecure',
+                                'type'      => 'select',
+                                'class'     => 'required-entry',
+                                'label'     => Mage::helper('payline')->__('Set'),
+                                'values'    => array(
+                                        1 => 'On',
+                                        0 => 'Off'
+                                )
+                        )
+                )
+        ) );
+
 
         return $this;
     }
-	
+
 	public function getGridUrl()
     {
         return $this->getUrl('*/*/grid', array('_current'=>true));
     }
-	
+
 	public function getRowUrl($row)
     {
-		
+
 	}
 
 }

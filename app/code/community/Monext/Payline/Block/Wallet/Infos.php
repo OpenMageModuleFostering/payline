@@ -1,7 +1,14 @@
 <?php
-/** Display wallet payment info (usually in the checkout progress bar 
- */ 
+/** Display wallet payment info (usually in the checkout progress bar
+ */
 class Monext_Payline_Block_Wallet_Infos extends Mage_Payment_Block_Info{
+
+    protected function _construct()
+    {
+        parent::_construct();
+        $this->setTemplate('payline/payment/info/monext.phtml');
+    }
+
  	/**
      * Prepare credit card related payment info
      *
@@ -29,6 +36,7 @@ class Monext_Payline_Block_Wallet_Infos extends Mage_Payment_Block_Info{
                 $this->__('Exp date') => $expMonth.'/'.$expYear
             );
         }
-        return $transport->setData(array_merge($data, $transport->getData()));
+
+        return $transport->setData(array_merge($transport->getData(),$data));
     }
 }

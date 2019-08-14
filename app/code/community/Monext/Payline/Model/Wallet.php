@@ -1,6 +1,6 @@
 <?php
 /**
- * Payline Wallet payment method, or pay in 1 click 
+ * Payline Wallet payment method, or pay in 1 click
  */
 class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
 {
@@ -15,9 +15,9 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
     protected $_canCapture = true;
     protected $_canCapturePartial = true;
     protected $_canVoid = true;
-    
+
     protected $_walletData;
-    
+
     /**
      * Return Order place redirect url
      *
@@ -27,7 +27,7 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
     {
         return Mage::getUrl('payline/index/wallet');
     }
-    
+
     /**
      * Retrieve the expiration date of the saved credit card
      * @return string
@@ -60,7 +60,7 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
             return false;
         }
     }
-    
+
     /**
      * Check whether payment method can be used
      * Rewrited from Abstract class
@@ -73,7 +73,6 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
     	if(!is_null($quote) && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) == 0){
             return false;
         }
-
         $checkResult = new StdClass;
         $checkResult->isAvailable=false;
         $customerSession = Mage::getSingleton('customer/session');
@@ -84,10 +83,10 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         }
         $checkResult->isAvailable=$this->checkExpirationDate();
         $checkResult->isAvailable = (
-            $checkResult->isAvailable && 
+            $checkResult->isAvailable &&
             $this->getConfigData('active', ($quote ? $quote->getStoreId() : null))
         );
-        
+
         // On Magento Pro 1.8, reward module is broken without quote. Let's provide it...
         if (!$quote)
             $quote=Mage::getSingleton('checkout/type_onepage')->getQuote();
@@ -110,57 +109,64 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         }
         return $checkResult->isAvailable;
     }
-    
+
     public function getWalletData(){
-        if (!empty($this->_walletData)) {
-            return $this->_walletData;
-		}
-		
+
         $customerSession=Mage::getSingleton('customer/session');
-        if ($customerSession->getWalletData() != null) {
-            return $customerSession->getWalletData();
+        if ($customerSession->hasWalletData()) {
+            $this->_walletData = $customerSession->getWalletData();
         }
-		
+
         if ($customerSession->isLoggedIn()){
             $customer=$customerSession->getCustomer();
             $walletId=$customer->getWalletId();
         }
-		
+
         if (!isset($walletId) || empty($walletId)){
-            return false;
+            $this->_walletData =  false;
         }
-        /* @var $paylineSDK PaylineSDK */
-		$helperPayline = Mage::helper('payline');
-        $paylineSDK = $helperPayline->initPayline('WALLET');
-		$walletContractNumber = $customer->getWalletContractNumber();
-		if(!$walletContractNumber) {
-			$walletContractNumber = $helperPayline->contractNumber;
-		}
-        $array=array('walletId'=>$walletId, 'cardInd' => '', 'contractNumber' => $walletContractNumber, 'version' => Monext_Payline_Helper_Data::VERSION);
-		try{
-            $res=$paylineSDK->getWallet($array);
-        }catch(Exception $e){
-            $msgLog='Unknown PAYLINE ERROR on getWallet for wallet '.$walletId.' (Payline unreachable?)';
-            $msg=Mage::helper('payline')->__('Error while retrieving wallet information');
-            Mage::helper('payline/logger')->log('[getWalletData] '.$msgLog);
-            Mage::getSingleton('customer/session')->addError($msg);
-        }
-        
-        if (!isset($res['result']) || $res['result']['code']!='02500'){
-            if(isset($res['result'])){
-                $msgLog='PAYLINE ERROR on getWallet: '.$res['result']['code']. ' '.$res['result']['longMessage'].' (wallet '.$walletId.')';
-            }else{
-                $msgLog='Unknown PAYLINE ERROR on getWallet for wallet '.$walletId;
+
+        if (is_null($this->_walletData)) {
+            /* @var $paylineSDK PaylineSDK */
+            $helperPayline = Mage::helper('payline');
+            $paylineSDK = $helperPayline->initPayline('WALLET');
+            $walletContractNumber = $customer->getWalletContractNumber();
+            if (! $walletContractNumber) {
+                $walletContractNumber = $helperPayline->contractNumber;
             }
-            $msg=Mage::helper('payline')->__('Error while retrieving wallet information');
-            Mage::helper('payline/logger')->log('[getWalletData] '.$msgLog);
-            Mage::getSingleton('customer/session')->addError($msg);
-            return false;
-        }else{
-            $this->_walletData=$res['wallet'];
-            $customerSession->setWalletData($res['wallet']);
-            return $res['wallet'];
+            $array = array(
+                        'walletId' => $walletId,
+                        'cardInd' => '',
+                        'contractNumber' => $walletContractNumber,
+                        'version' => Monext_Payline_Helper_Data::VERSION);
+
+            try {
+                $res = $paylineSDK->getWallet($array);
+            } catch (Exception $e) {
+                $msgLog = 'Unknown PAYLINE ERROR on getWallet for wallet ' . $walletId . ' (Payline unreachable?)';
+                $msg = Mage::helper('payline')->__('Error while retrieving wallet information');
+                Mage::helper('payline/logger')->log('[getWalletData] ' . $msgLog);
+                Mage::getSingleton('customer/session')->addError($msg);
+                $this->_walletData = false;
+            }
+            if (is_string($res) or ! isset($res['result']) || $res['result']['code'] != '02500') {
+                $this->_walletData = false;
+                if (is_string($res)) {
+                    $msgLog = 'PAYLINE ERROR on getWallet: ' . $res;
+                } elseif (isset($res['result'])) {
+                    $msgLog = 'PAYLINE ERROR on getWallet: ' . $res['result']['code'] . ' ' . $res['result']['longMessage'] . ' (wallet ' . $walletId . ')';
+                } else {
+                    $msgLog = 'Unknown PAYLINE ERROR on getWallet for wallet ' . $walletId;
+                }
+                $msg = Mage::helper('payline')->__('Error while retrieving wallet information');
+                Mage::helper('payline/logger')->log('[getWalletData] ' . $msgLog);
+                Mage::getSingleton('customer/session')->addError($msg);
+            } else {
+                $this->_walletData = $res['wallet'];
+            }
         }
+        $customerSession->setWalletData($this->_walletData);
+        return $this->_walletData;
     }
 
     /**
@@ -185,7 +191,7 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ";
         $customerData = array('1','1'); // fake data in order to enter while loop
         $walletId = "";
-        
+
         while(sizeof($customerData) != 0){ // this loop make sure that generated wallet ID is not already used
         	$string = '_';
         	for ($p = 0; $p < $length; $p++) {
@@ -195,10 +201,10 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         	$customerModel = Mage::getModel('customer/customer')->getCollection()->addFieldToFilter('wallet_id',$walletId); // search for a cistomer having this wallet ID
         	$customerData = $customerModel->getFirstItem()->getData();
         }
-        
+
         return $walletId;
     }
-    
+
 	/**
      * Capture payment
      *
@@ -222,7 +228,7 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         Mage::getModel('payline/cpt')->refund($payment,$amount, 'WALLET');
         return $this;
     }
-    
+
     /**
      * Cancel payment
      *

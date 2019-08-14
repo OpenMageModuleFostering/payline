@@ -30,8 +30,8 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
             'legend' => Mage::helper('payline')->__('Contract Informations'),
             'class'  => 'fieldset-wide'
         ));
-        
-            
+
+
 		$fieldset->addField('name', 'text', array(
 			'name'      => 'name',
 			'label'     => Mage::helper('payline')->__('Name'),
@@ -39,7 +39,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
 			'required'  => true,
 			'disabled'  => true
 		));
-		
+
 		$fieldset->addField('number', 'text', array(
 			'name'      => 'number',
 			'label'     => Mage::helper('payline')->__('Number'),
@@ -47,7 +47,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
 			'required'  => true,
 			'disabled'  => true
 		));
-		
+
 		$fieldset->addField('point_of_sell', 'text', array(
 			'name'      => 'point_of_sell',
 			'label'     => Mage::helper('payline')->__('Point Of Sell'),
@@ -55,7 +55,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
 			'required'  => true,
 			'disabled'  => true
 		));
-		
+
 		$fieldset->addField('is_primary', 'checkbox', array(
 			'name'      => 'is_primary',
 			'label'     => Mage::helper('payline')->__('Primary'),
@@ -64,7 +64,7 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
 			'checked'   => ($model->getIsPrimary() ? true : false),
 			'onclick'   => 'this.value = this.checked ? 1 : 0'
 		));
-		
+
 		$fieldset->addField('is_secondary', 'checkbox', array(
 			'name'      => 'is_secondary',
 			'label'     => Mage::helper('payline')->__('Secondary'),
@@ -73,7 +73,17 @@ class Monext_Payline_Block_Adminhtml_Managecontracts_Edit_Form extends Mage_Admi
 			'checked'   => ($model->getIsSecondary() ? true : false),
 			'onclick'   => 'this.value = this.checked ? 1 : 0'
 		));
-                        
+
+
+		$fieldset->addField('is_secure', 'checkbox', array(
+		        'name'      => 'is_secure',
+		        'label'     => Mage::helper('payline')->__('Secure'),
+		        'title'     => Mage::helper('payline')->__('Secure'),
+		        'required'  => false,
+		        'checked'   => ($model->getIsSecure() ? true : false),
+		        'onclick'   => 'this.value = this.checked ? 1 : 0'
+		));
+
         /*************************************************************************************************************/
         /* Id 																								         */
         /*************************************************************************************************************/

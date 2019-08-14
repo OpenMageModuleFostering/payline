@@ -1,0 +1,26 @@
+<?php
+
+?>
+<center>
+<span class="please-wait" id="final-review-please-wait">
+    <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo $this->__('Redirecting to ACS...') ?>" title="<?php echo $this->__('Redirecting to ACS...') ?>" class="v-middle" />
+    <?php echo $this->__('Redirecting to ACS...') ?>
+</span>
+<br/><br/>
+<?php echo $this->__('You will be redirect to your bank website to validate your transaction.'); ?>
+</center>
+
+<form name="3DSForm" action="<?php echo $this->getSecureUrl();?>" method='POST'>
+<?php foreach ($this->getSecureParams() as $paramKey=>$paramValue): ?>
+    <input type="hidden" name="<?php echo $paramKey;?>" value="<?php echo $paramValue;?>">
+<?php endforeach;?>
+<noscript><input type='submit' name='submit' value='<?php echo $this->__('Click to manual redirect to ACS'); ?>'></noscript>
+</form>
+
+<script type="text/javascript">
+//<![CDATA[
+window.onload = function(){
+    document.createElement('form').submit.call(document.forms['3DSForm']);
+}
+//]]>
+</script>

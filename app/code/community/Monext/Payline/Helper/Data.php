@@ -211,7 +211,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     protected $_availablePaymentMethods = array(
         'DIRECT', 'CPT', 'NX', 'WALLET'
     );
-    
+
     public $merchantId                  = '';
     public $accessKey                   = '';
     public $proxyHost                   = '';
@@ -291,14 +291,15 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     }
 
     /**
-     * 
+     *
      * Test if we can create a new Wallet
      */
     public function canSubscribeWallet()
     {
+        $walletActive               = Mage::getStoreConfig('payment/PaylineWALLET/active');
         $automateSubscriptionEnable = Mage::getStoreConfig('payment/payline_common/automate_wallet_subscription');
         $customer                   = Mage::getSingleton('customer/session')->getCustomer();
-        return $automateSubscriptionEnable && $customer->getWalletId() == '';
+        return $walletActive && $automateSubscriptionEnable && $customer->getWalletId() == '';
     }
 
     public function createWalletForCurrentCustomer($paylineSDK, $array)
@@ -306,14 +307,23 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         if ($this->canSubscribeWallet()) {
         	try {
         		$customer = Mage::getSingleton('customer/session')->getCustomer();
-        		$array['contractNumber']     = $array['payment']['contractNumber'];
+                $array['contractNumber']     = $array['payment']['contractNumber'];
         		$array['wallet']['walletId'] = Mage::getModel('payline/wallet')->generateWalletId($customer->id); // TODO
-        		$walletResult                = $paylineSDK->createWallet($array);
-        		if (isset($walletResult['result']['code']) && $walletResult['result']['code'] == '02500') {
-        			$customer->setWalletId($array['wallet']['walletId'])
-                        ->setWalletContractNumber($array['contractNumber'])
-                        ->save();
-                }
+                $walletResult                = $paylineSDK->createWallet($array);
+
+		        if (isset($walletResult['result']['code']) && $walletResult['result']['code'] == '02500') {
+		                $customer->setWalletId($array['wallet']['walletId'])
+		                ->setWalletContractNumber($array['contractNumber'])
+		                ->save();
+		        } else {
+		            $msg = '[createWallet] Error creating';
+		            if (is_string($walletResult)) {
+		                $msg = ' '.$walletResult;
+		            } elseif (isset($walletResult['result']['code'])) {
+		                $msg = ', code: '.$walletResult['result']['code'];
+		            }
+		            Mage::helper('payline/logger')->log($msg);
+		        }
         	} catch (Mage_Core_Exception $e) {
         		Mage::logException($e);
         	}
@@ -321,7 +331,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     }
 
     /**
-     * 
+     *
      * Initialize a payline webservice for payment
      * @param string $paymentMethod (CPT, NX or DIRECT)
      * @param $_numericCurrencyCode If provided, will also initialize currency
@@ -338,7 +348,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         }
         $xmlConfigPath    = 'payment/Payline' . $paymentMethod;
         $commonConfigPath = 'payment/payline_common';
-        $paylineFolder    = Mage::getBaseDir() . '/app/code/community/Monext/Payline/';
+
         $this->merchantId = Mage::getStoreConfig($commonConfigPath . '/merchant_id');
         $this->accessKey  = Mage::getStoreConfig($commonConfigPath . '/access_key');
         if (Mage::getStoreConfig($commonConfigPath . '/proxy_host') == '') {
@@ -354,6 +364,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         $this->proxyLogin    = Mage::getStoreConfig($commonConfigPath . '/proxy_login');
         $this->proxyPassword = Mage::getStoreConfig($commonConfigPath . '/proxy_password');
         $this->environment   = Mage::getStoreConfig($commonConfigPath . '/environment');
+
         $this->securityMode  = self::SECURITY_MODE;
         $this->languageCode  = Mage::getStoreConfig($commonConfigPath . '/language');
 
@@ -427,7 +438,8 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
             $this->customPaymentPageCode = $customTheme;
         }
 
-        require_once($paylineFolder . 'lib/paylineSDK.php');
+
+        require_once(Mage::getModuleDir('',"Monext_Payline") . '/lib/paylineSDK.php');
         $payline                           = new paylineSDK($this->merchantId, $this->accessKey, $this->proxyHost, $this->proxyPort, $this->proxyLogin, $this->proxyPassword, $this->environment, Mage::getBaseDir('var').'/log/paylineSDK_');
         $payline->returnURL                = $this->returnUrl;
         $payline->cancelURL                = $this->cancelUrl;
@@ -438,6 +450,13 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         $payline->securityMode             = $this->securityMode;
         $payline->paymentAction            = $this->paymentAction;
         return $payline;
+    }
+
+    public function isProduction()
+    {
+        require_once(Mage::getModuleDir('',"Monext_Payline") . '/lib/paylineSDK.php');
+
+        return Mage::getStoreConfig('payment/payline_common/environment') == paylineSDK::ENV_PROD;
     }
 
     protected function _prepareContractList($primary = true, $filterCB = false)
@@ -513,9 +532,9 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     }
 
     /**
-     * 
+     *
      * Get the contract number from a transaction (needen if defautl contract number!= of the one trully used - fore instance in a web payment & card AMEX)
-     * @param PaylineSDK $paylineSDK 
+     * @param PaylineSDK $paylineSDK
      * @param string $transactionId
      * @param string $orderRef
      */
@@ -799,14 +818,14 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         }
         return sizeof($contractsNumber) > 0 ? $contractsNumber : null;
     }
-    
+
     public function getProxyParams(){
     	return array('host' => $this->proxyHost, 'port' => $this->proxyPort, 'login' => $this->proxyLogin, 'password' => $this->proxyPassword);
     }
-    
+
     /**
-     * 
-     * Sets order details in Payline request, from cart content 
+     *
+     * Sets order details in Payline request, from cart content
      * @param $paylineSDK the current sdk instance
      * @param $order the current order
      * @param $sendPaylineproductCat flag to determine wether store or Payline product categories shall be sent
@@ -820,9 +839,6 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     			$itemPrice = round($item->getPrice()*100);
     			if($itemPrice > 0){
     				$product = array();
-    				$product['category'] = null;
-    				$product['subcategory1'] = null;
-    				$product['subcategory2'] = null;
     				$itemProduct = Mage::getModel('catalog/product')->load($item->getProductId());
     				$catIdsArray = $itemProduct->getCategoryIds();
     				$currentProductCategoryId = $catIdsArray[0];
@@ -864,18 +880,17 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     						}
     					}
     				}
-
-    				// delete special characters 
+    				// delete special characters
     				$product['category'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['category']),0,50));
     				$product['subcategory1'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['subcategory1']),0,50));
     				$product['subcategory2'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['subcategory2']),0,50));
-    	
-    				$product['ref'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getName())),0,50);
+
+    				$product['ref'] = Mage::helper('payline')->encodeString(substr(str_replace(array("\r","\n","\t"), array('','',''),$item->getName()),0,50));
     				$product['price'] = round($item->getPrice()*100);
     				$product['quantity'] = round($item->getQtyOrdered());
-    				$product['comment'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getDescription())), 0,255);
+    				$product['comment'] = Mage::helper('payline')->encodeString(substr(str_replace(array("\r","\n","\t"), array('','',''),$item->getDescription()), 0,255));
     				$product['taxRate'] = round($item->getTaxPercent()*100);
-    				$product['additionalData'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getAdditionalData())), 0,255);
+    				$product['additionalData'] = Mage::helper('payline')->encodeString(substr(str_replace(array("\r","\n","\t"), array('','',''),$item->getAdditionalData()), 0,255));
     				$product['brand'] = $itemProduct->getAttributeText('manufacturer');
     				$paylineSDK->setItem($product);
     			}
@@ -883,6 +898,175 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     		}
     	}
     }
-}
 
-// end class
+    /**
+     * Return all contract with is_secure set to $securized.
+     *
+     * @param bool $securized
+     *
+     * @return Monext_Payline_Model_Mysql4_Contract_Collection
+     */
+    public function getCcContracts($securized=true, $cbType= true, $primary=true)
+    {
+        $key = ($securized) ? 1 : 0;
+        $keyPrimary = ($primary) ? 1 : 0;
+        if (!isset($this->_ccContracts[$key]) || !isset($this->_ccContracts[$key][$keyPrimary])) {
+
+            $contracts = Mage::getModel('payline/contract')->getCollection()
+                ->addFilterSecure($securized, Mage::app()->getStore()->getId());
+
+            if($cbType) {
+                $contracts->addFieldToFilter('contract_type', array('CB', 'AMEX', 'MCVISA'));
+            }
+
+            //No need to be primary nor secondary if contract is secure
+            if(!$securized) {
+                $contracts->addFilterStatus($primary, Mage::app()->getStore()->getId());
+            }
+
+            $this->_ccContracts[$key][$keyPrimary] = $contracts;
+        }
+
+        return $this->_ccContracts[$key][$keyPrimary];
+    }
+
+    /**
+     * Return contract by code en securise property
+     *
+     * @param string $type
+     * @param bool $securized
+     *
+     * @return Monext_Payline_Model_Contract
+     */
+    public function getContractByType($type, $securized=false)
+    {
+        $returnContract=false;
+        $contractNumber=0;
+        $contracts = $this->getCcContracts($securized);
+        foreach ($contracts as $contract) {
+            if($type==$contract->getContractType()) {
+                $returnContract = $contract;
+                $contractNumber++;
+            }
+        }
+        if($contractNumber==1 and $returnContract) {
+            return $returnContract;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getWeb2TokenKey()
+    {
+        return Mage::getStoreConfig('payment/PaylineDIRECT/web2token_key');
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function _getAes256()
+    {
+        return hash("SHA256", $this->accessKey, true);
+    }
+
+    /**
+     * Reserve an orderid and return a unique crypted key
+     *
+     * @return string
+     */
+    public function getCryptedKeys($quote=null)
+    {
+        //Reserve an OrderId
+        if(is_null($quote)) {
+            $quote= Mage::getSingleton('checkout/session')->getQuote();
+        }
+
+        $quote->reserveOrderId()->save();
+        $crypted = array();
+
+        $numericCurrency =  $this->getNumericCurrencyCode($quote->getBaseCurrencyCode());
+
+        $paylineSDK = $this->initPayline('DIRECT',$numericCurrency);
+
+        $orderRef = $quote->getReservedOrderId();
+
+        $availableContracts = $this->getCcContracts();
+
+        foreach($availableContracts as $contract) {
+            $messageUtf8 = utf8_encode($this->merchantId . ";" . $orderRef . ";" . $contract['number']);
+            $crypted[$contract['id']] = $paylineSDK->getEncrypt($messageUtf8, $this->_getAes256());
+        }
+
+        return $crypted;
+    }
+
+    /**
+     *
+     * @param string $tokenData
+     * @param string $order
+     *
+     * @return array
+     */
+    public function getDecryptedCardTokenPan($tokenData, $order)
+    {
+        $numericCurrency =  $this->getNumericCurrencyCode($order->getBaseCurrencyCode());
+
+        $paylineSDK = $this->initPayline('DIRECT',$numericCurrency);
+
+        $decrypt = $paylineSDK->gzdecode($paylineSDK->getDecrypt($tokenData, $this->_getAes256()));
+        $arrayDecrypt = explode(';',$decrypt);
+        $paymentData = array(
+                'cardTokenPan'	=> $arrayDecrypt[0],
+                'cardExp'		=> $arrayDecrypt[1],
+                'vCVV'			=> $arrayDecrypt[2],
+                'orderRef'		=> $arrayDecrypt[3],
+                'cardType'		=> $arrayDecrypt[4],
+                'cardIsCVD '	=> $arrayDecrypt[5],
+                'cardCountry'	=> $arrayDecrypt[6],
+                'cardProduct'	=> $arrayDecrypt[7],
+                'bankCode'		=> $arrayDecrypt[8]
+        );
+
+        return $paymentData;
+    }
+
+
+    public function getCptConfigTemplate()
+    {
+        return Mage::getStoreConfig('payment/PaylineCPT/data_template', Mage::app()->getStore());
+    }
+
+    public function disableOnepagePaymentStep()
+    {
+        $template = $this->getCptConfigTemplate();
+        return !empty($template) && $template!='redirect';
+    }
+
+
+    public function getContractsForWidget($primary=true)
+    {
+        $contractCPT = $this->getCcContracts(false, false,$primary);
+
+        $contracts = array();
+        foreach($contractCPT as $contract) {
+            $contracts[]= $contract->getNumber();
+        }
+
+        return $contracts;
+    }
+
+
+    public function getDefaultContractNumberForWidget()
+    {
+        $contracts = $this->getContractsForWidget();
+
+        return !empty($contracts) ? $contracts[0] : false;
+    }
+
+
+} // end class

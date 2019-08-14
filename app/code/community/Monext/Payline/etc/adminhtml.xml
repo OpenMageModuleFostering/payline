@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+<!--        <system>
+            <children>
+                <payline translate="title" module="payline">
+                    <title>Manage Payline Contracts</title>
+                    <sort_order>10</sort_order>
+                    <action>adminhtml/payline_managecontracts/index</action>
+                </payline>
+            </children>
+        </system> -->
+        <catalog>
+        	<children>
+                <payline translate="title" module="payline">
+                    <title>Manage Payline Product Categories</title>
+                    <sort_order>10</sort_order>
+                    <action>adminhtml/payline_manageproductcategories/index</action>
+                </payline>
+        	</children>
+        </catalog>
+    </menu>    
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <payline translate="title" module="payline">
+                                        <title>Payline Section</title>
+                                        <children>
+                                            <payline_contract translate="title" module="payline">
+                                              <title>Manage Payline Contracts</title>
+                                            </payline_contract>
+                                        </children>
+                                    </payline>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                    <catalog>
+                    	<children>
+                    		<payline>
+                                <title>Manage Payline Product Categories</title>
+                                <sort_order>10</sort_order>
+                            </payline>
+                        </children>
+                    </catalog>
+                </children>
+            </admin>
+        </resources>
+    </acl>    
+</config>

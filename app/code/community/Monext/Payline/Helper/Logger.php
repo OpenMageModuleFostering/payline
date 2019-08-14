@@ -2,15 +2,17 @@
 /**
  * On Magento 1.3.2.4, the Mage::log method don't allow us to force log, so we've to log by an other way
  */
+require_once(Mage::getModuleDir('',"Monext_Payline") . '/lib/paylineSDK.php');
+
 class Monext_Payline_Helper_Logger extends Mage_Core_Helper_Abstract{
-    const FILE='payline.log';
-    const LEVEL=Zend_Log::DEBUG;
-    
+    const FILE  = 'payline.log';
+    const LEVEL = Zend_Log::DEBUG;
+
     protected static $loggers=array();
-    
+
 
      /**
-     * forced log facility 
+     * forced log facility
      *
      * @param string $message
      * @param integer $level
@@ -51,9 +53,14 @@ class Monext_Payline_Helper_Logger extends Mage_Core_Helper_Abstract{
                 $message = print_r($message, true);
             }
 
+            if(Mage::getStoreConfig('payment/payline_common/environment') != paylineSDK::ENV_PROD and $level==Zend_Log::ERR) {
+                Mage::getSingleton('core/session')->addError($message);
+            }
+
             self::$loggers[$file]->log($message, $level);
-        }
-        catch (Exception $e) {
+
+        } catch (Exception $e) {
+
         }
     }
 }

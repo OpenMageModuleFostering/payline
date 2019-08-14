@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This controller manage mapping between Payline and store product categories 
+ * This controller manage mapping between Payline and store product categories
  */
 class Monext_Payline_Adminhtml_Payline_ManageproductcategoriesController extends Mage_Adminhtml_Controller_Action
 {
@@ -19,7 +19,7 @@ class Monext_Payline_Adminhtml_Payline_ManageproductcategoriesController extends
     	$this->loadLayout()
     	->renderLayout();
     }
-    
+
     public function unassignAction()
     {
     	$rowId = $this->getRequest()->getParam('id');
@@ -29,11 +29,34 @@ class Monext_Payline_Adminhtml_Payline_ManageproductcategoriesController extends
     	try {
     		$model->setId($rowId)->save();
     	} catch (Exception $e){
-    		echo $e->getMessage(); 
+    		echo $e->getMessage();
     	}
     	$this->_redirect('*/*/');
     }
-    
+
+    public function updateAction()
+    {
+        $collection = Mage::getModel('catalog/category')->getCollection()
+            ->addAttributeToSelect('name')
+            ->addAttributeToSelect('is_active')
+            ->addAttributeToFilter('level',array('gt'=>1));
+
+        $collection->getSelect()
+           ->joinLeft(array('plncat'=>$collection->getTable('payline_product_categories')), 'plncat.store_category_id=e.entity_id')
+           ->where('plncat.store_category_id is null');
+
+
+        foreach ($collection as $category) {
+            $pc = Mage::getModel('payline/productcategories')
+                    ->setStoreCategoryId($category->getId())
+                    ->setStoreCategoryLabel(Mage::helper('payline/category')->getCategoryFullpathName($category->getId()))
+                    ->setPaylineCategoryId(-1)
+                    ->save();
+        }
+
+        $this->_redirect('*/*/');
+    }
+
     /**
     * Save status assignment to state
     */
@@ -43,14 +66,14 @@ class Monext_Payline_Adminhtml_Payline_ManageproductcategoriesController extends
     	if ($data) {
     		$paylineCategoryId  = $this->getRequest()->getParam('paylinecat');
     		$rowId = Mage::getSingleton('core/session')->getData('rowCatToAssign');
-    		
+
 			$data = array('payline_category_id' => $paylineCategoryId, 'payline_category_label' => Mage::getModel('payline/datasource_paylineproductcategories')->getLabelbyId($paylineCategoryId));
 			$model = Mage::getModel('payline/productcategories')->load($rowId);
 			$model->addData($data);
 			try {
 				$model->setId($rowId)->save();
 			} catch (Exception $e){
-				echo $e->getMessage(); 
+				echo $e->getMessage();
 			}
     		$this->_redirect('*/*/index');
     		return;
@@ -61,41 +84,31 @@ class Monext_Payline_Adminhtml_Payline_ManageproductcategoriesController extends
     public function resetAction()
     {
     	$pcCol = Mage::getModel('payline/productcategories')->getCollection();
-    	
+
     	// delete current mapping between Payline and store categories
     	foreach ($pcCol as $pcitem) {
     		$pcitem->delete();
     	}
-    	
-    	$scCol = Mage::getModel('catalog/category')->getCollection()
-            ->addAttributeToSelect('name')
-            ->addAttributeToSelect('is_active');
-    	
-    	// add entry for each active store category
-    	$arrayCat = array();
-    	foreach ($scCol as $scitem) {
-    		$data = $scitem->getData();
-    		$arrayCat[$data['entity_id']] = $data['name'];
-    	}
-    	foreach ($scCol as $scitem) {
-    		$data = $scitem->getData();
-    		$path = explode('/',$data['path']);
-    		$lab = '';
-    		$size = sizeof($path);
-    		$idRootCats = array(1,2); // identifiants des catégories "Root Catalog" et "Root Catalog/Default Category/"
-    		for($i=0;$i<$size;$i++){
-    			if($size>2 && in_array($path[$i], $idRootCats)){ // on supprime "Root Catalog/Default Category/" du chemin des autres sous-catégories
-    				$lab .= '/';
-    			}else{
-    				$lab .= $arrayCat[$path[$i]].'/';
-    			}
-    		}
+
+    	$categories = Mage::helper('payline/category')->getAllCategoriesWithFullpathName();
+    	foreach ($categories as $categoryId=>$categoryPath) {
     		$pc = Mage::getModel('payline/productcategories')
-    		->setStoreCategoryId($data['entity_id'])
-    		->setStoreCategoryLabel(trim($lab))
-    		->setPaylineCategoryId(-1);
-    		$pc->save();
+            		->setStoreCategoryId($categoryId)
+            		->setStoreCategoryLabel($categoryPath)
+            		->setPaylineCategoryId(-1)
+            		->save();
     	}
     	$this->_redirect('*/*');
+    }
+
+    /**
+     * Order grid
+     */
+    public function gridAction()
+    {
+        $this->loadLayout();
+        $this->getResponse()->setBody(
+                $this->getLayout()->createBlock('payline/adminhtml_manageproductcategories_grid')->toHtml()
+        );
     }
 }
