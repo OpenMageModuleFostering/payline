@@ -14,6 +14,22 @@ class Monext_Payline_Model_Direct extends Mage_Payment_Model_Method_Abstract
     protected $_canVoid                 = true;
     protected $_canOrder                = true;
 
+    /**
+    * Check whether payment method can be used
+    * Rewrited from Abstract class
+    * TODO: payment method instance is not supposed to know about quote
+    * @param Mage_Sales_Model_Quote
+    * @return bool
+    */
+	public function isAvailable($quote = null)
+    {
+    	if(!is_null($quote) && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0){
+    		return parent::isAvailable($quote);
+    	}else{
+    		return false;
+    	}
+    }
+    
     public function assignData($data)
     {
         if (!($data instanceof Varien_Object)) {
@@ -112,10 +128,10 @@ class Monext_Payline_Model_Direct extends Mage_Payment_Model_Method_Abstract
                 $itemPrice = round($item->getPrice() * 100);
                 if ($itemPrice > 0) {
                     $product             = array();
-                    $product['ref']      = Mage::helper('payline')->encodeString(substr(str_replace(array("\r", "\n", "\t"), array('', '', ''), $item->getName()), 0, 50));
+                    $product['ref']      = substr(Mage::helper('payline')->encodeString(str_replace(array("\r", "\n", "\t"), array('', '', ''), $item->getName())), 0, 50);
                     $product['price']    = round($item->getPrice() * 100);
                     $product['quantity'] = round($item->getQtyOrdered());
-                    $product['comment']  = Mage::helper('payline')->encodeString(substr(str_replace(array("\r", "\n", "\t"), array('', '', ''), $item->getDescription()), 0, 255));
+                    $product['comment']  = substr(Mage::helper('payline')->encodeString(str_replace(array("\r", "\n", "\t"), array('', '', ''), $item->getDescription())), 0, 255);
                     $paylineSDK->setItem($product);
                 }
             }

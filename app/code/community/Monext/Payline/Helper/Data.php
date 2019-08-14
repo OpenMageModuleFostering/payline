@@ -5,7 +5,11 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
 
     const SECURITY_MODE                      = 'SSL';
     const CREATE_INVOICE_SHOP_RETURN         = 'return';
-    const VERSION                            = 4;
+    const WALLET_NONE                        = 'NONE';
+    const WALLET_3DS                         = '3DS';
+    const WALLET_CVV                         = 'CVV';
+    const WALLET_BOTH                        = 'BOTH';
+    const VERSION                            = 10;
 
     /**
      * Currency codes (ISO 4217) supported by Payline
@@ -214,7 +218,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     public $proxyPort                   = '';
     public $proxyLogin                  = '';
     public $proxyPassword               = '';
-    public $production                  = '';
+    public $environment                 = '';
     public $securityMode                = '';
     public $languageCode                = '';
     public $paymentAction               = '';
@@ -232,17 +236,6 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     public $orderCurrency               = '';
     public $walletId                    = '';
     public $isNewWallet                 = false;
-    public $primaryMaxfailRetry         = '';
-    public $primaryCallTimeout          = '';
-    public $secondaryMaxfailRetry       = '';
-    public $secondaryCallTimeout        = '';
-    public $switchBackTimer             = '';
-    public $paylineWsSwitchEnable       = '';
-    public $ini_file                    = '';
-    public $paylineErrCode              = '';
-    public $paylineErrToken             = '';
-    public $primaryTokenPrefix          = '';
-    public $secondaryTokenPrefix        = '';
 
     /**
      * Loaded payment contract types
@@ -311,19 +304,19 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
     public function createWalletForCurrentCustomer($paylineSDK, $array)
     {
         if ($this->canSubscribeWallet()) {
-            $array['contractNumber']     = $array['payment']['contractNumber'];
-            $array['wallet']['walletId'] = Mage::getModel('payline/wallet')->generateWalletId();
-            $walletResult                = $paylineSDK->createWallet($array);
-            if (isset($walletResult['result']['code']) && $walletResult['result']['code'] == '02500') {
-                try {
-                    $customer = Mage::getSingleton('customer/session')->getCustomer();
-                    $customer->setWalletId($array['wallet']['walletId'])
+        	try {
+        		$customer = Mage::getSingleton('customer/session')->getCustomer();
+        		$array['contractNumber']     = $array['payment']['contractNumber'];
+        		$array['wallet']['walletId'] = Mage::getModel('payline/wallet')->generateWalletId($customer->id); // TODO
+        		$walletResult                = $paylineSDK->createWallet($array);
+        		if (isset($walletResult['result']['code']) && $walletResult['result']['code'] == '02500') {
+        			$customer->setWalletId($array['wallet']['walletId'])
                         ->setWalletContractNumber($array['contractNumber'])
                         ->save();
-                } catch (Mage_Core_Exception $e) {
-                    Mage::logException($e);
                 }
-            }
+        	} catch (Mage_Core_Exception $e) {
+        		Mage::logException($e);
+        	}
         }
     }
 
@@ -345,7 +338,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         }
         $xmlConfigPath    = 'payment/Payline' . $paymentMethod;
         $commonConfigPath = 'payment/payline_common';
-        $paylineFolder    = Mage::getBaseDir() . '/app/code/community/Monext/Payline/PaylinePHPKit/';
+        $paylineFolder    = Mage::getBaseDir() . '/app/code/community/Monext/Payline/';
         $this->merchantId = Mage::getStoreConfig($commonConfigPath . '/merchant_id');
         $this->accessKey  = Mage::getStoreConfig($commonConfigPath . '/access_key');
         if (Mage::getStoreConfig($commonConfigPath . '/proxy_host') == '') {
@@ -360,7 +353,7 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         }
         $this->proxyLogin    = Mage::getStoreConfig($commonConfigPath . '/proxy_login');
         $this->proxyPassword = Mage::getStoreConfig($commonConfigPath . '/proxy_password');
-        $this->production    = Mage::getStoreConfig($commonConfigPath . '/production');
+        $this->environment   = Mage::getStoreConfig($commonConfigPath . '/environment');
         $this->securityMode  = self::SECURITY_MODE;
         $this->languageCode  = Mage::getStoreConfig($commonConfigPath . '/language');
 
@@ -398,9 +391,9 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         } elseif ($paymentMethod == 'CPT') {
             $this->paymentMode        = 'CPT';
             $this->paymentAction      = Mage::getStoreConfig($xmlConfigPath . '/payline_payment_action');
-            $this->cancelUrl          = Mage::getUrl('payline/index/cptcancel');
-            $this->notificationUrl    = Mage::getUrl('payline/index/cptnotif');
             $this->returnUrl          = Mage::getUrl('payline/index/cptreturn');
+            $this->notificationUrl    = $this->returnUrl;
+            $this->cancelUrl          = $this->returnUrl;
             $this->contractNumberList = $this->_prepareContractList(true, false);
         } elseif ($paymentMethod == 'WALLET') {//1 clic payment
             $this->paymentMode           = 'CPT';
@@ -434,27 +427,8 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
             $this->customPaymentPageCode = $customTheme;
         }
 
-        $this->primaryMaxfailRetry   = Mage::getStoreConfig($commonConfigPath . '/primary_max_fail_retry');
-        $this->primaryCallTimeout    = Mage::getStoreConfig($commonConfigPath . '/primary_call_timeout');
-        $this->primaryReplayTimer    = Mage::getStoreConfig($commonConfigPath . '/primary_replay_timer');
-        $this->secondaryMaxfailRetry = Mage::getStoreConfig($commonConfigPath . '/secondary_max_fail_retry');
-        $this->secondaryCallTimeout  = Mage::getStoreConfig($commonConfigPath . '/secondary_call_timeout');
-        $this->secondaryReplayTimer  = Mage::getStoreConfig($commonConfigPath . '/secondary_replay_timer');
-
-        $this->switchBackTimer = Mage::getStoreConfig($commonConfigPath . '/switch_back_timer');
-
-        $this->paylineWsSwitchEnable = Mage::getStoreConfig($commonConfigPath . '/payline_ws_switch_enable');
-
-        $this->ini_file = $paylineFolder . 'configuration/HighDefinition.ini';
-
-        $this->paylineErrCode  = Mage::getStoreConfig($commonConfigPath . '/payline_err_code');
-        $this->paylineErrToken = Mage::getStoreConfig($commonConfigPath . '/payline_err_token');
-
-        $this->primaryTokenPrefix   = Mage::getStoreConfig($commonConfigPath . '/primary_token_prefix');
-        $this->secondaryTokenPrefix = Mage::getStoreConfig($commonConfigPath . '/secondary_token_prefix');
-
         require_once($paylineFolder . 'lib/paylineSDK.php');
-        $payline                           = new paylineSDK($this->merchantId, $this->accessKey, $this->proxyHost, $this->proxyPort, $this->proxyLogin, $this->proxyPassword, $this->production);
+        $payline                           = new paylineSDK($this->merchantId, $this->accessKey, $this->proxyHost, $this->proxyPort, $this->proxyLogin, $this->proxyPassword, $this->environment, Mage::getBaseDir('var').'/log/paylineSDK_');
         $payline->returnURL                = $this->returnUrl;
         $payline->cancelURL                = $this->cancelUrl;
         $payline->notificationURL          = $this->notificationUrl;
@@ -825,7 +799,90 @@ class Monext_Payline_Helper_Data extends Mage_Core_Helper_Data
         }
         return sizeof($contractsNumber) > 0 ? $contractsNumber : null;
     }
+    
+    public function getProxyParams(){
+    	return array('host' => $this->proxyHost, 'port' => $this->proxyPort, 'login' => $this->proxyLogin, 'password' => $this->proxyPassword);
+    }
+    
+    /**
+     * 
+     * Sets order details in Payline request, from cart content 
+     * @param $paylineSDK the current sdk instance
+     * @param $order the current order
+     * @param $sendPaylineproductCat flag to determine wether store or Payline product categories shall be sent
+     * @param $pcCol Payline product categories collection
+     */
+    public function setOrderDetails($paylineSDK, $order, $sendPaylineproductCat, $pcCol){
+    	$items = $order->getAllItems();
+    	if ($items) {
+    		if(count($items)>100) $items=array_slice($items,0,100);
+    		foreach($items as $item) {
+    			$itemPrice = round($item->getPrice()*100);
+    			if($itemPrice > 0){
+    				$product = array();
+    				$product['category'] = null;
+    				$product['subcategory1'] = null;
+    				$product['subcategory2'] = null;
+    				$itemProduct = Mage::getModel('catalog/product')->load($item->getProductId());
+    				$catIdsArray = $itemProduct->getCategoryIds();
+    				$currentProductCategoryId = $catIdsArray[0];
+    				$currentProductCategory = Mage::getModel('catalog/category')->load($currentProductCategoryId);
+    				if($currentProductCategory != null){
+    					$currentProductCategoryData = $currentProductCategory->getData();
+    					$productCategoryTree = explode('/',$currentProductCategoryData['path']);
+    					$productCategoryDepth = sizeof($productCategoryTree);
+    					$categorySet = false;
+    					$subcategory1Set = false;
+    					$subcategory2Set = false;
+    					for($c=0;$c<$productCategoryDepth-1;$c++){
+    						$productCategory = Mage::getModel('catalog/category')->load($productCategoryTree[$c]);
+    						$productCategoryData = $productCategory->getData();
+    						if(!in_array($productCategoryData['entity_id'],array(1,2))){
+    							// skip "Root Catalog" and "Root Catalog/Default Category/"
+    							if(!$categorySet){
+    								if($sendPaylineproductCat){
+    									$product['category'] = $pcCol->getAssignedPaylineCatId($productCategoryData['entity_id']);
+    								}else{
+    									$product['category'] = $productCategoryData['name'];
+    								}
+    								$categorySet = true;
+    							}elseif(!$subcategory1Set){
+    								if($sendPaylineproductCat){
+    									$product['subcategory1'] = $pcCol->getAssignedPaylineCatId($productCategoryData['entity_id']);
+    								}else{
+    									$product['subcategory1'] = $productCategoryData['name'];
+    								}
+    								$subcategory1Set = true;
+    							}elseif(!$subcategory2Set){
+    								if($subcategory2Set){
+    									$product['subcategory2'] = $pcCol->getAssignedPaylineCatId($productCategoryData['entity_id']);
+    								}else{
+    									$product['subcategory2'] = $productCategoryData['name'];
+    								}
+    								$subcategory2Set = true;
+    							}
+    						}
+    					}
+    				}
 
+    				// delete special characters 
+    				$product['category'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['category']),0,50));
+    				$product['subcategory1'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['subcategory1']),0,50));
+    				$product['subcategory2'] = preg_replace('/[^A-Za-z0-9\-]/', '', substr(str_replace(array("\r","\n","\t"," "), array('','','',''),$product['subcategory2']),0,50));
+    	
+    				$product['ref'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getName())),0,50);
+    				$product['price'] = round($item->getPrice()*100);
+    				$product['quantity'] = round($item->getQtyOrdered());
+    				$product['comment'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getDescription())), 0,255);
+    				$product['taxRate'] = round($item->getTaxPercent()*100);
+    				$product['additionalData'] = substr(Mage::helper('payline')->encodeString(str_replace(array("\r","\n","\t"), array('','',''),$item->getAdditionalData())), 0,255);
+    				$product['brand'] = $itemProduct->getAttributeText('manufacturer');
+    				$paylineSDK->setItem($product);
+    			}
+    			continue;
+    		}
+    	}
+    }
 }
 
 // end class

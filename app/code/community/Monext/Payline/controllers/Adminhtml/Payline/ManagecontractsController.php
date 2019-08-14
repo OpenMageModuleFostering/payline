@@ -35,7 +35,7 @@ class Monext_Payline_Adminhtml_Payline_ManagecontractsController extends Mage_Ad
         if (is_string($result)) { //error message from web service
             $msgError = $result;
             if (stristr('Authorization Required', $result)) {
-                $msgError .= '. ' . Mage::helper('payline')->__('Please check your authentication params (merchant Id / access key / production) in System > Configuration');
+                $msgError .= '. ' . Mage::helper('payline')->__('Please check your authentication params (merchant Id / access key / environment) in System > Configuration');
             } elseif (stristr('could not connect to host', $result)) {
                 $msgError .= '. ' . Mage::helper('payline')->__('Please check your proxy params (Proxy host / port / login / password) in System > Configuration');
             }

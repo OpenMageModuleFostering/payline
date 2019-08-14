@@ -64,6 +64,8 @@ class Monext_Payline_Block_Direct extends Mage_Payment_Block_Form
         $years[$index1 + 1] = $years[$index1] + 1;
         $years[$index1 + 2] = $years[$index1] + 2;
         $years[$index1 + 3] = $years[$index1] + 3;
+        $years[$index1 + 4] = $years[$index1] + 4;
+        $years[$index1 + 5] = $years[$index1] + 5;
         return $years;
     }
 

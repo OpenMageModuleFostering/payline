@@ -7,7 +7,7 @@
  * @author Jacques Bodin-Hullin <j.bodinhullin@monsieurbiz.com> <@jacquesbh>
  * @category Monext
  * @package Monext_Payline
- * @copyright Copyright (c) 2014 Monsieur Biz (http://monsieurbiz.com)
+ * @copyright Copyright (c) 2015 Monext (http://www.monext.net)
  */
 
 /**
@@ -16,10 +16,6 @@
  */
 class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
 {
-
-    // Monsieur Biz Tag NEW_CONST
-
-    // Monsieur Biz Tag NEW_VAR
 
     /**
      * Init a payment
@@ -40,51 +36,92 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
         $array['order']['amount']   = $array['payment']['amount'];
         $array['order']['currency'] = $_numericCurrencyCode;
 
-        $billingAddress = $order->getBillingAddress();
+        $billingAddress = $order->getBillingAddress();      
 
         // BUYER
-        $buyerLastName = substr($order->getCustomerLastname(), 0, 50);
+        $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+        $buyerLastName = substr($customer->getLastname(), 0, 50);
         if ($buyerLastName == null || $buyerLastName == '') {
             $buyerLastName = substr($billingAddress->getLastname(), 0, 50);
         }
-        $buyerFirstName = substr($order->getCustomerFirstname(), 0, 50);
+        $buyerFirstName = substr($customer->getFirstname(), 0, 50);
         if ($buyerFirstName == null || $buyerFirstName == '') {
             $buyerFirstName = substr($billingAddress->getFirstname(), 0, 50);
         }
         $array['buyer']['lastName']  = Mage::helper('payline')->encodeString($buyerLastName);
         $array['buyer']['firstName'] = Mage::helper('payline')->encodeString($buyerFirstName);
 
-        $email         = $order->getCustomerEmail();
+        $email = $customer->getEmail();
+        if ($email == null || $email == '') {
+        	$email = $order->getCustomerEmail();
+        }
         $pattern       = '/\+/i';
         $charPlusExist = preg_match($pattern, $email);
-
         if (strlen($email) <= 50 && Zend_Validate::is($email, 'EmailAddress') && !$charPlusExist) {
             $array['buyer']['email'] = Mage::helper('payline')->encodeString($email);
         } else {
             $array['buyer']['email'] = '';
         }
         $array['buyer']['customerId'] = Mage::helper('payline')->encodeString($email);
-
-        // ADDRESS : !!!WARNING!!! PaylineSDK v4.33 reverse billingAddress & shippingAdress.
-        // Take this : https://www.youtube.com/watch?v=MA6kXUgZ7lE&list=PLpyrjJvJ7GJ7bM5GjzwHvZIqe6c5l3iF6
-        $array['shippingAddress']['name']     = Mage::helper('payline')->encodeString(substr($billingAddress->getName(), 0, 100));
-        $array['shippingAddress']['street1']  = Mage::helper('payline')->encodeString(substr($billingAddress->getStreet1(), 0, 100));
-        $array['shippingAddress']['street2']  = Mage::helper('payline')->encodeString(substr($billingAddress->getStreet2(), 0, 100));
-        $array['shippingAddress']['cityName'] = Mage::helper('payline')->encodeString(substr($billingAddress->getCity(), 0, 40));
-        $array['shippingAddress']['zipCode']  = substr($billingAddress->getPostcode(), 0, 12);
-        //The $billing->getCountry() returns a 2 letter ISO2, should be fine
-        $array['shippingAddress']['country']  = $billingAddress->getCountry();
-        $forbidenCars                         = array(' ', '.', '(', ')', '-');
-        $phone                                = str_replace($forbidenCars, '', $billingAddress->getTelephone());
-        $regexpTel                            = '/^\+?[0-9]{1,14}$/';
-
-        if (preg_match($regexpTel, $phone)) {
-            $array['shippingAddress']['phone'] = $phone;
-        } else {
-            $array['shippingAddress']['phone'] = '';
+        $array['buyer']['accountCreateDate'] = date('d/m/y',$customer->getCreatedAtTimestamp());
+        
+        $array['buyer']['accountOrderCount'] = 0; // previous orders count
+        $array['buyer']['accountAverageAmount'] = 0; // average order amount, in cents
+        
+        $ordersHistory = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('customer_id',$order->getCustomerId());
+        $ordersHistoryCount = $ordersHistory->count();
+        if($ordersHistoryCount != 0){
+        	$cumulAmount = 0;
+        	$maxEntity = 0;
+        	foreach ($ordersHistory as $oldOrder){
+        		$oldOrderData = $oldOrder->getData();
+        		if($oldOrderData['entity_id'] > $maxEntity && $oldOrderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE){
+        			$maxEntity = $oldOrderData['entity_id'];
+        			$array['plnLastCompleteOrderAge'] = round((time()-strtotime($oldOrderData['created_at']))/(60*60*24));
+        		}
+        		$cumulAmount += $oldOrder->getBaseGrandTotal();
+        	}
+        	$array['buyer']['accountOrderCount'] = $ordersHistoryCount;
+        	$array['buyer']['accountAverageAmount'] = round(($cumulAmount/$ordersHistoryCount)*100);
         }
+        
 
-        $array['billingAddress'] = null;
+        $forbidenPhoneCars                    = array(' ','.','(',')','-','/','\\','#');
+        $regexpPhone                            = '/^\+?[0-9]{1,14}$/';
+        
+        $shippingAddress = $order->getShippingAddress();
+        if($shippingAddress != null){
+        	$array['shippingAddress']['name']     	= substr(Mage::helper('payline')->encodeString($shippingAddress->getName()), 0, 100);
+        	$array['shippingAddress']['title']     	= Mage::helper('payline')->encodeString($shippingAddress->getPrefix());
+        	$array['shippingAddress']['firstName']	= substr(Mage::helper('payline')->encodeString($shippingAddress->getFirstname()), 0, 100);
+        	$array['shippingAddress']['lastName']	= substr(Mage::helper('payline')->encodeString($shippingAddress->getLastname()), 0, 100);
+        	$array['shippingAddress']['street1']  	= substr(Mage::helper('payline')->encodeString($shippingAddress->getStreet1()), 0, 100);
+        	$array['shippingAddress']['street2']  	= substr(Mage::helper('payline')->encodeString($shippingAddress->getStreet2()), 0, 100);
+        	$array['shippingAddress']['cityName'] 	= substr(Mage::helper('payline')->encodeString($shippingAddress->getCity()), 0, 40);
+        	$array['shippingAddress']['zipCode']  	= substr($shippingAddress->getPostcode(), 0, 12);
+        	$array['shippingAddress']['country']  	= $shippingAddress->getCountry();
+        	$array['shippingAddress']['state']  	= Mage::helper('payline')->encodeString($shippingAddress->getRegion());
+        	$shippingPhone                        	= str_replace($forbidenPhoneCars, '', $shippingAddress->getTelephone());
+        	if (preg_match($regexpPhone, $shippingPhone)) {
+        		$array['shippingAddress']['phone'] = $shippingPhone;
+        	}
+        }
+        
+
+     	$array['billingAddress']['name']     	= substr(Mage::helper('payline')->encodeString($billingAddress->getName()), 0, 100);
+     	$array['billingAddress']['title']     	= Mage::helper('payline')->encodeString($billingAddress->getPrefix());
+     	$array['billingAddress']['firstName']	= substr(Mage::helper('payline')->encodeString($billingAddress->getFirstname()), 0, 100);
+     	$array['billingAddress']['lastName']	= substr(Mage::helper('payline')->encodeString($billingAddress->getLastname()), 0, 100);
+        $array['billingAddress']['street1']		= substr(Mage::helper('payline')->encodeString($billingAddress->getStreet1()), 0, 100);
+        $array['billingAddress']['street2']		= substr(Mage::helper('payline')->encodeString($billingAddress->getStreet2()), 0, 100);
+        $array['billingAddress']['cityName']	= substr(Mage::helper('payline')->encodeString($billingAddress->getCity()), 0, 40);
+        $array['billingAddress']['zipCode']		= substr($billingAddress->getPostcode(), 0, 12);
+        $array['billingAddress']['country']		= $billingAddress->getCountry();
+        $array['billingAddress']['state']		= Mage::helper('payline')->encodeString($billingAddress->getRegion());
+        $billingPhone							= str_replace($forbidenPhoneCars, '', $billingAddress->getTelephone());
+        if (preg_match($regexpPhone, $billingPhone)) {
+            $array['billingAddress']['phone'] = $billingPhone;
+        }
 
         return $array;
     }
@@ -98,7 +135,7 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
     public function updateOrder($order, $res, $transactionId, $paymentType = 'CPT')
     {
         // First, log message which says that we are updating the order
-        Mage::helper('payline/logger')->log("[updateOrder] Mise à jour commande " . $order->getIncrementId() . " (mode $paymentType) avec la transaction $transactionId");
+        Mage::helper('payline/logger')->log("[updateOrder] Mise  � jour commande " . $order->getIncrementId() . " (mode $paymentType) avec la transaction $transactionId");
 
         // By default this process isn't OK
         $orderOk = false;
@@ -112,6 +149,10 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
                 '02500', // Wallet -> Operation successfull
                 '02501', // Wallet -> Operation Successfull with warning / Operation Successfull but wallet will expire
                 '04003', // Fraud detected - BUT Transaction approved (04002 is Fraud with payment refused)
+                '00100',
+                '03000',
+                '34230', // signature SDD
+                '34330' // prelevement SDD
             );
 
             // Transaction OK
@@ -126,14 +167,14 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
                     if (isset($res['billingRecordList']['billingRecord'][0])) {
                         $code_echeance = $res['billingRecordList']['billingRecord'][0]->result->code;
                         if ($code_echeance == '00000' || $code_echeance == '02501') {
-                            Mage::helper('payline/logger')->log("[updateOrder] première échéance paiement NX OK");
+                            Mage::helper('payline/logger')->log("[updateOrder] first NX instalment OK");
                             $orderOk = true;
                         } else {
-                            Mage::helper('payline/logger')->log("[updateOrder] première échéance paiement NX refusée, code " . $code_echeance);
+                            Mage::helper('payline/logger')->log("[updateOrder] first NX instalment KO, code " . $code_echeance);
                             $orderOk = false;
                         }
                     } else {
-                        Mage::helper('payline/logger')->log("[updateOrder] La première échéance de paiement est à venir");
+                        Mage::helper('payline/logger')->log("[updateOrder] first instalment to come");
                     }
                 }
 
@@ -168,8 +209,8 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
      */
     public function updateStock($order)
     {
-        if (Mage::getStoreConfig(Mage_CatalogInventory_Model_Stock_Item::XML_PATH_CAN_SUBTRACT) == 1) { // le stock a été décrémenté à la commande
-            // ré-incrémentation du stock
+        if (Mage::getStoreConfig(Mage_CatalogInventory_Model_Stock_Item::XML_PATH_CAN_SUBTRACT) == 1) { // stock was decreased at order
+            // stock update
             $items = $order->getAllItems();
             if ($items) {
                 foreach ($items as $item) {
@@ -183,6 +224,7 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
                     }
                     $stock->save(); // Save
                 }
+                Mage::helper('payline/logger')->log('[updateStock] done for order '.$order->getIncrementId());
             }
         }
     }
@@ -229,7 +271,5 @@ class Monext_Payline_Helper_Payment extends Mage_Core_Helper_Abstract
         }
         return $contract;
     }
-
-    // Monsieur Biz Tag NEW_METHOD
 
 }

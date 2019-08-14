@@ -69,6 +69,11 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
      * @return bool
      */
     public function isAvailable($quote = null){
+    	// if cart amount is null, this payment method is not shown on front
+    	if(!is_null($quote) && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) == 0){
+            return false;
+        }
+
         $checkResult = new StdClass;
         $checkResult->isAvailable=false;
         $customerSession = Mage::getSingleton('customer/session');
@@ -154,7 +159,6 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
         }else{
             $this->_walletData=$res['wallet'];
             $customerSession->setWalletData($res['wallet']);
-            //$this->getInfoInstance()->setAdditionalInformation('owner','qsdf');
             return $res['wallet'];
         }
     }
@@ -174,13 +178,25 @@ class Monext_Payline_Model_Wallet extends Mage_Payment_Model_Method_Abstract
      * @param int $length
      * @return string
      */
-    public function generateWalletId($length=32){
+    public function generateWalletId($length=10){
+    	$customer = Mage::getSingleton('customer/session')->getCustomer();
+    	$prefix = $customer->getId() ? $customer->getId() : "XXX"; // prefix start with current customer ID if set, XXX otherwise
+    	$prefix .= '_'.date('Ymd',time()); // current date (format YYYYMMDD) is added to the prefix
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZ";
-        $string = '';
-        for ($p = 0; $p < $length; $p++) {
-            $string .= $characters[mt_rand(0, strlen($characters)-1)];
+        $customerData = array('1','1'); // fake data in order to enter while loop
+        $walletId = "";
+        
+        while(sizeof($customerData) != 0){ // this loop make sure that generated wallet ID is not already used
+        	$string = '_';
+        	for ($p = 0; $p < $length; $p++) {
+        		$string .= $characters[mt_rand(0, strlen($characters)-1)];
+        	}
+        	$walletId = $prefix.$string;
+        	$customerModel = Mage::getModel('customer/customer')->getCollection()->addFieldToFilter('wallet_id',$walletId); // search for a cistomer having this wallet ID
+        	$customerData = $customerModel->getFirstItem()->getData();
         }
-        return $string;
+        
+        return $walletId;
     }
     
 	/**

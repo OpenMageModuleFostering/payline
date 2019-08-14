@@ -2,8 +2,7 @@
 <config>
     <modules>
         <Monext_Payline>
-            <version>1.7.7</version>
-            <release>1.8.0.1</release>
+            <version>1.8.3.1</version>
         </Monext_Payline>
     </modules>
     <global>
@@ -36,6 +35,12 @@
                     <fees>
                         <table>payline_nx_fees</table>
                     </fees>
+                    <productcategories>
+                        <table>payline_product_categories</table>
+                    </productcategories>
+                    <token>
+                        <table>payline_token</table>
+                    </token>
                 </entities>
             </payline_mysql4>
             <sales>
@@ -207,6 +212,15 @@
                     </payline>
                 </children>
             </system>
+            <catalog>
+            	<children>
+                    <payline translate="title" module="payline">
+                        <title>Manage Payline Product Categories</title>
+                        <sort_order>10</sort_order>
+                        <action>adminhtml/payline_manageproductcategories/index</action>
+                    </payline>
+            	</children>
+            </catalog>
         </menu>
         <acl>
             <resources>
@@ -220,6 +234,14 @@
                                 </payline>
                             </children>
                         </system>
+                        <catalog>
+                        	<children>
+                        		<payline>
+                                    <title>Manage Payline Product Categories</title>
+                                    <sort_order>10</sort_order>
+                                </payline>
+                            </children>
+                        </catalog>
                     </children>
                 </admin>
             </resources>
@@ -235,19 +257,6 @@
                 <init_order_status>pending</init_order_status>
                 <fraud_order_status>pending</fraud_order_status>
                 <automate_wallet_subscription>1</automate_wallet_subscription>
-                <primary_max_fail_retry>1</primary_max_fail_retry>
-                <primary_call_timeout>15</primary_call_timeout>
-                <primary_replay_timer>15</primary_replay_timer>
-                <secondary_max_fail_retry>2</secondary_max_fail_retry>
-                <secondary_call_timeout>15</secondary_call_timeout>
-                <secondary_replay_timer>15</secondary_replay_timer>
-                <switch_back_timer>600</switch_back_timer>
-                <payline_ws_switch_enable />
-                <payline_err_code>02101,02102,02103</payline_err_code>
-                <payline_err_token>02317,02318</payline_err_token>
-                <primary_token_prefix>1</primary_token_prefix>
-                <secondary_token_prefix>2</secondary_token_prefix>
-                <return_payment_refused>0</return_payment_refused>
             </payline_common>
             <PaylineCPT>
                 <model>payline/cpt</model>

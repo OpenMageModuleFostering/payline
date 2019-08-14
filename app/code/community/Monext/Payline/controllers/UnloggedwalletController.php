@@ -30,6 +30,7 @@ class Monext_Payline_UnloggedwalletController extends Mage_Core_Controller_Front
         $customer->setWebsiteId(Mage::app()->getWebsite()->getId());
         $customer->loadByEmail($res['wallet']['email']);
         $customer->setWalletId($res['wallet']['walletId']);
+        $customer->setWalletContract(Mage::helper('payline')->contractNumber);
         $customer->save();
         $msg=Mage::helper('payline')->__('Wallet subscription succeed');
         Mage::getSingleton('core/session')->addSuccess($msg);
@@ -67,18 +68,16 @@ class Monext_Payline_UnloggedwalletController extends Mage_Core_Controller_Front
      * New subscription notification
      */
     public function updateNotifyAction(){
-        $res = Mage::helper('payline')->initPayline('WALLET')->getWebWallet(array('token' => $_GET['token'], 'version' => Monext_Payline_Helper_Data::VERSION));
+    	$customerData = Mage::getSingleton('customer/session')->getCustomer()->getData();
+        Mage::helper('payline')->initPayline('WALLET')->getWebWallet(array('token' => $_GET['token'], 'version' => Monext_Payline_Helper_Data::VERSION)); // appel sans traitement pour désactiver la notification
+    	$res = Mage::helper('payline')->initPayline('WALLET')->getCards(array('contractNumber' => $customerData['wallet_contract_number'], 'walletId' => $customerData['wallet_id']));
         $redirectUrl="payline/wallet/manage";
-        if (!isset($res['result']) || $res['result']['code']!='02500'){
-            if(isset($res['result'])){
-                $msgLog='PAYLINE ERROR on getWebWallet after update: '.$res['result']['code']. ' '.$res['result']['longMessage'];
-            }else{
-                $msgLog='Unknown PAYLINE ERROR on getWebWallet after update';
-            }
+        if ($res['result']['code']!='02500'){
+        	$msgLog='PAYLINE ERROR on getWebWallet after update: '.$res['result']['code']. ' '.$res['result']['longMessage'];
             $msg=Mage::helper('payline')->__('Error during update');
             Mage::helper('payline/Logger')->log('[updateNotifyAction] ' .$msgLog);
             Mage::getSingleton('core/session')->addError($msg);
-            $redirectUrl="payline/wallet/udpate";
+            $redirectUrl="payline/wallet/update";
             return $redirectUrl;
         }
         Mage::getSingleton('customer/session')->setWalletData(null);

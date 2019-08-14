@@ -27,6 +27,21 @@
             <block type="payline/adminhtml_managecontracts_grid" name="admin.contracts.grid"/>
         </block>
     </adminhtml_payline_managecontracts_grid>
+    
+    <adminhtml_payline_manageproductcategories_index>
+        <reference name="content">
+            <block type="payline/adminhtml_manageproductcategories" name="productcategories_container">
+                <block type="adminhtml/system_config_switcher" name="store_switcher" as="store_switcher" template="payline/switcher.phtml"></block>
+            </block>
+        </reference>
+    </adminhtml_payline_manageproductcategories_index>
+   
+    <adminhtml_payline_manageproductcategories_assign>
+    	<reference name="content">
+    		<block type="payline/adminhtml_manageproductcategories_assign_form" name="manageproductcategories_assign" template="payline/assignProductCategories.phtml">
+    		</block>
+    	</reference>
+    </adminhtml_payline_manageproductcategories_assign>
 	
     <adminhtml_sales_order_view>
         <reference name="order_totals">

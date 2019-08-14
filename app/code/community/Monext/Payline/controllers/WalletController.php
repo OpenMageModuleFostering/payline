@@ -56,6 +56,7 @@ class Monext_Payline_WalletController extends Mage_Core_Controller_Front_Action
         $this->_initLayoutMessages('core/session');
         $this->renderLayout();
     }
+    
 
     /**
      * Display wallet subscription iframe
@@ -78,11 +79,10 @@ class Monext_Payline_WalletController extends Mage_Core_Controller_Front_Action
         $paylineHelper->cancelUrl       = Mage::getUrl('payline/unloggedwallet/subscribeCancel');
         /* @var $paylineSDK PaylineSDK */
         $paylineSDK                     = $paylineHelper->initPayline('WALLET');
-        //TODO add address data
         $array                          = array(
             'buyer'           => array(
-                'lastName'  => Mage::helper('payline')->encodeString(substr($customer->getLastname(), 0, 100)),
-                'firstName' => Mage::helper('payline')->encodeString(substr($customer->getFirstname(), 0, 100)),
+                'lastName'  => substr(Mage::helper('payline')->encodeString($customer->getLastname()), 0, 100),
+                'firstName' => substr(Mage::helper('payline')->encodeString($customer->getFirstname()), 0, 100),
                 'walletId'  => Mage::getModel('payline/wallet')->generateWalletId()
             ),
             'billingAddress'  => array(),
@@ -223,7 +223,8 @@ class Monext_Payline_WalletController extends Mage_Core_Controller_Front_Action
         $paylineHelper                  = Mage::helper('payline');
         $paylineHelper->notificationUrl = Mage::getUrl('payline/unloggedwallet/updateNotify');
         $paylineHelper->returnUrl       = Mage::getUrl('payline/unloggedwallet/updateReturn');
-        $paylineHelper->cancelUrl       = Mage::getUrl('payline/unloggedwallet/updateCancel');
+        //$paylineHelper->cancelUrl       = Mage::getUrl('payline/unloggedwallet/updateCancel');
+        $paylineHelper->cancelUrl       = Mage::getUrl('payline/unloggedwallet/updateReturn');
         /* @var $paylineSDK PaylineSDK */
         $paylineSDK                     = $paylineHelper->initPayline('WALLET');
         $array                          = array(
@@ -237,8 +238,8 @@ class Monext_Payline_WalletController extends Mage_Core_Controller_Front_Action
             'billingAddress'        => '',
             'shippingAddress'       => '',
             'buyer'                 => array(
-                'lastName'  => Mage::helper('payline')->encodeString(substr($customer->getLastname(), 0, 100)),
-                'firstName' => Mage::helper('payline')->encodeString(substr($customer->getFirstname(), 0, 100)),
+                'lastName'  => substr(Mage::helper('payline')->encodeString($customer->getLastname()), 0, 100),
+                'firstName' => substr(Mage::helper('payline')->encodeString($customer->getFirstname()), 0, 100),
                 'walletId'  => $walletId
             )
         );
