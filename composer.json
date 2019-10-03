@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Payline",
+    "name": "OpenMageModuleFostering\/Payline",
     "type": "magento-module",
     "license": "GNU-General-Public-License-(GPL)",
     "homepage": "",
-    "description": "Paiement sécurisé via Payline, par Monext.",
+    "description": "Paiement s\u00e9curis\u00e9 via Payline, par Monext.",
     "authors": [
-    {
-        "name": "Payline",
-        "email": "support@payline.com"
-    }
-],
+        {
+            "name": "Payline",
+            "email": "support@payline.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
